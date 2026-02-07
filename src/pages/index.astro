@@ -8,7 +8,11 @@ const db = Astro.locals?.runtime?.env?.DB;
 const locale = (Astro.locals as any).locale || 'id';
 const tr = translations.home;
 
-const featuredArticles = await getPosts(db, { limit: 3, featured: true });
+// Get latest articles (featured first, then recent)
+const featuredArticles = await getPosts(db, { limit: 6, featured: true });
+const latestArticles = featuredArticles.length >= 3 
+  ? featuredArticles.slice(0, 3) 
+  : await getPosts(db, { limit: 3 }); // Fallback to latest if no featured
 const featuredProducts = await getProducts(db, 4);
 
 // Helper for localized text
@@ -61,7 +65,7 @@ const getLocalized = (obj: any, key: string) => {
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {featuredArticles.map((article) => (
+      {latestArticles.map((article) => (
         <a href={`/blog/${article.slug}`} class="group block bg-surface rounded-xl overflow-hidden hover:shadow-lg transition-all border border-white/5">
           <div class="aspect-video overflow-hidden">
             <OptimizedImage 
