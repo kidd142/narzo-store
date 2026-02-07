@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import OptimizedImage from '../components/OptimizedImage.astro';
 import { getPosts, getProducts } from '../lib/db';
-import { t, translations } from '../lib/i18n';
+import { t, translations, getLocalizedArticle } from '../lib/i18n';
 
 const db = Astro.locals?.runtime?.env?.DB;
 const locale = (Astro.locals as any).locale || 'id';
@@ -15,8 +15,8 @@ const latestArticles = featuredArticles.length >= 3
   : await getPosts(db, { limit: 3 }); // Fallback to latest if no featured
 const featuredProducts = await getProducts(db, 4);
 
-// Helper for localized text
-const getLocalized = (obj: any, key: string) => {
+// Helper for localized product text (products don't have same bilingual structure)
+const getLocalizedProduct = (obj: any, key: string) => {
   if (locale === 'en' && obj[`${key}_en`]) return obj[`${key}_en`];
   return obj[`${key}_id`] || obj[`${key}`] || '';
 };
@@ -65,12 +65,14 @@ const getLocalized = (obj: any, key: string) => {
     </div>
     
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {latestArticles.map((article) => (
+      {latestArticles.map((article) => {
+        const { title } = getLocalizedArticle(article, locale);
+        return (
         <a href={`/blog/${article.slug}`} class="group block bg-surface rounded-xl overflow-hidden hover:shadow-lg transition-all border border-white/5">
           <div class="aspect-video overflow-hidden">
             <OptimizedImage 
               src={article.cover_image || '/images/placeholder-article.jpg'} 
-              alt={getLocalized(article, 'title')}
+              alt={title}
               width={600}
               height={338}
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -78,12 +80,12 @@ const getLocalized = (obj: any, key: string) => {
           </div>
           <div class="p-5">
             <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
-              {getLocalized(article, 'title')}
+              {title}
             </h3>
             <p class="text-sm text-gray-500">{t(translations.blog.read_more, locale)} →</p>
           </div>
         </a>
-      ))}
+      )})}
     </div>
   </section>
 
@@ -104,7 +106,7 @@ const getLocalized = (obj: any, key: string) => {
             <div class="aspect-[4/3] overflow-hidden relative">
               <OptimizedImage 
                 src={product.image_url || '/images/placeholder-product.jpg'} 
-                alt={getLocalized(product, 'name')}
+                alt={getLocalizedProduct(product, 'name')}
                 width={400}
                 height={300}
                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -112,7 +114,7 @@ const getLocalized = (obj: any, key: string) => {
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
             <div class="p-4">
-              <h3 class="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{getLocalized(product, 'name')}</h3>
+              <h3 class="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{getLocalizedProduct(product, 'name')}</h3>
               <p class="text-accent font-medium">Rp {product.price.toLocaleString('id-ID')}</p>
             </div>
           </a>

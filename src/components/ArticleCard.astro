@@ -1,6 +1,6 @@
 ---
 import type { Post } from '../lib/db';
-import { t } from '../lib/i18n';
+import { getLocalizedArticle } from '../lib/i18n';
 
 interface Props {
   post: Post;
@@ -8,8 +8,7 @@ interface Props {
 }
 
 const { post, locale } = Astro.props;
-const title = t({ id: post.title_id, en: post.title_en }, locale);
-const excerpt = t({ id: post.excerpt_id, en: post.excerpt_en }, locale);
+const { title, excerpt } = getLocalizedArticle(post, locale);
 ---
 
 <article class="card group">

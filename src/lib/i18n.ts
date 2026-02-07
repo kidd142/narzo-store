@@ -1,6 +1,42 @@
+/**
+ * Translate content based on locale
+ * RULE: Fallback konsisten - jika EN tidak ada, tampilkan ID
+ * Ini mencegah "language leak" (campur bahasa)
+ */
 export function t(obj: { id: string | null; en: string | null }, locale: string) {
   if (locale === 'en' && obj.en) return obj.en;
+  // Fallback ke ID jika EN tidak tersedia (konsisten, tidak campur)
   return obj.id || '';
+}
+
+/**
+ * Check if all EN translations are available for an article
+ * Used to determine if article should display in EN or fallback entirely to ID
+ */
+export function hasCompleteEnTranslation(article: { 
+  title_en?: string | null; 
+  excerpt_en?: string | null;
+}): boolean {
+  return !!(article.title_en && article.excerpt_en);
+}
+
+/**
+ * Get localized article fields with consistency
+ * If EN is incomplete, returns all ID to prevent mixed languages
+ */
+export function getLocalizedArticle(article: {
+  title_id?: string | null;
+  title_en?: string | null;
+  excerpt_id?: string | null;
+  excerpt_en?: string | null;
+}, locale: string): { title: string; excerpt: string } {
+  // Jika locale EN tapi terjemahan tidak lengkap, fallback ke ID sepenuhnya
+  const useEnglish = locale === 'en' && hasCompleteEnTranslation(article);
+  
+  return {
+    title: (useEnglish ? article.title_en : article.title_id) || '',
+    excerpt: (useEnglish ? article.excerpt_en : article.excerpt_id) || ''
+  };
 }
 
 // Static translations for UI elements
