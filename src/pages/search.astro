@@ -3,7 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
 import type { Post } from '../lib/db';
 
-const query = Astro.url.searchParams.get('q') || '';
+const rawQuery = Astro.url.searchParams.get('q') || '';
+// Sanitize query - remove HTML tags and limit length
+const query = rawQuery.replace(/<[^>]*>/g, '').slice(0, 100);
 const db = Astro.locals.runtime.env.DB;
 const locale = Astro.currentLocale || 'id';
 
