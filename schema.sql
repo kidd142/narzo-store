@@ -24,7 +24,10 @@ CREATE TABLE IF NOT EXISTS categories (
   slug TEXT UNIQUE NOT NULL,
   name_id TEXT NOT NULL,
   name_en TEXT,
-  sort_order INTEGER DEFAULT 0
+  parent_id TEXT,                     -- NULL = parent category, filled = child
+  icon TEXT,                          -- emoji or icon name
+  sort_order INTEGER DEFAULT 0,
+  FOREIGN KEY (parent_id) REFERENCES categories(id)
 );
 
 CREATE TABLE IF NOT EXISTS products (

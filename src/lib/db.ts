@@ -128,3 +128,84 @@ export async function getRelatedPosts(
   
   return result.results || [];
 }
+
+// Category types
+export interface Category {
+  id: string;
+  slug: string;
+  name_id: string;
+  name_en: string | null;
+  parent_id: string | null;
+  icon: string | null;
+  sort_order: number;
+  children?: Category[];
+}
+
+// Get all categories with hierarchy
+export async function getCategories(db: D1Database | null, options: {
+  parentOnly?: boolean;
+  parentId?: string;
+  hierarchical?: boolean;
+} = {}) {
+  if (!db) {
+    console.warn('No database connection');
+    return [];
+  }
+
+  const { parentOnly, parentId, hierarchical = true } = options;
+  
+  let query = 'SELECT * FROM categories';
+  const params: any[] = [];
+  
+  if (parentOnly) {
+    query += ' WHERE parent_id IS NULL';
+  } else if (parentId) {
+    query += ' WHERE parent_id = ?';
+    params.push(parentId);
+  }
+  
+  query += ' ORDER BY sort_order ASC';
+  
+  const result = await db.prepare(query).bind(...params).all<Category>();
+  let categories = result.results || [];
+  
+  // Build hierarchical structure
+  if (hierarchical && !parentOnly && !parentId) {
+    const parents = categories.filter(c => !c.parent_id);
+    const children = categories.filter(c => c.parent_id);
+    
+    categories = parents.map(parent => ({
+      ...parent,
+      children: children.filter(c => c.parent_id === parent.id)
+    }));
+  }
+  
+  return categories;
+}
+
+// Get category by slug
+export async function getCategoryBySlug(db: D1Database | null, slug: string) {
+  if (!db) {
+    console.warn('No database connection');
+    return null;
+  }
+
+  return await db.prepare(
+    'SELECT * FROM categories WHERE slug = ?'
+  ).bind(slug).first<Category>();
+}
+
+// Get child categories
+export async function getChildCategories(db: D1Database | null, parentId: string) {
+  if (!db) {
+    console.warn('No database connection');
+    return [];
+  }
+
+  const result = await db.prepare(
+    'SELECT * FROM categories WHERE parent_id = ? ORDER BY sort_order ASC'
+  ).bind(parentId).all<Category>();
+  
+  return result.results || [];
+}
+
