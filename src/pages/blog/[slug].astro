@@ -1,0 +1,97 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AdSlot from '../../components/AdSlot.astro';
+import ShareButtons from '../../components/ShareButtons.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
+import { getPostBySlug, getRelatedPosts, incrementViews } from '../../lib/db';
+import { t } from '../../lib/i18n';
+
+const { slug } = Astro.params;
+const db = Astro.locals.runtime.env.DB;
+const post = await getPostBySlug(db, slug!);
+
+if (!post) return Astro.redirect('/404');
+
+await incrementViews(db, post.id);
+
+const locale = Astro.currentLocale || 'id';
+const title = t({ id: post.title_id, en: post.title_en }, locale);
+const content = t({ id: post.content_id, en: post.content_en }, locale);
+
+// Calculate reading time (avg 200 words per minute)
+const wordCount = content?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0;
+const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+
+// Get related posts by category
+const relatedPosts = await getRelatedPosts(db, post.category, post.id, 3);
+
+const pageUrl = `${Astro.site}blog/${post.slug}`;
+const enableAds = post.enable_ads === 1;
+---
+
+<BaseLayout title={title} description={post.excerpt_id || ''} showHeaderAd={enableAds}>
+  <div class="container mx-auto px-4 py-12">
+    <div class="grid lg:grid-cols-[1fr_300px] gap-8">
+      <!-- Article Content -->
+      <article class="max-w-3xl">
+        {post.cover_image && (
+          <img src={post.cover_image} alt={title}
+               class="w-full h-64 md:h-96 object-cover rounded-xl mb-8" />
+        )}
+        
+        <h1 class="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
+        
+        <div class="flex flex-wrap gap-4 text-gray-500 mb-6">
+          <span class="badge-info">{post.category}</span>
+          <span>•</span>
+          <span>{readingTime} min read</span>
+          <span>•</span>
+          <span>{post.views} views</span>
+        </div>
+        
+        <!-- Share buttons -->
+        <ShareButtons url={pageUrl} title={title} />
+        
+        <!-- In-article ad (top) -->
+        {enableAds && <AdSlot slot="in-article" class="my-8" />}
+        
+        <div class="prose-dark mt-8" set:html={content} />
+        
+        <!-- In-article ad (bottom) -->
+        {enableAds && <AdSlot slot="in-article" class="my-8" />}
+        
+        <!-- Tags -->
+        {post.tags && (
+          <div class="flex flex-wrap gap-2 mt-8 pt-8 border-t border-surface-100">
+            {post.tags.split(',').map(tag => (
+              <span class="px-3 py-1 bg-surface-50 rounded-full text-sm text-gray-400">
+                #{tag.trim()}
+              </span>
+            ))}
+          </div>
+        )}
+        
+        <!-- Share buttons bottom -->
+        <div class="mt-8 pt-8 border-t border-surface-100">
+          <p class="text-gray-500 mb-4">Share this article:</p>
+          <ShareButtons url={pageUrl} title={title} />
+        </div>
+      </article>
+      
+      <!-- Sidebar -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-20">
+          {enableAds && <AdSlot slot="sidebar" />}
+        </div>
+      </aside>
+    </div>
+  </div>
+  
+  <!-- Related Posts -->
+  {relatedPosts.length > 0 && (
+    <section class="container mx-auto px-4 py-12 border-t border-surface-100">
+      <h2 class="text-2xl font-bold mb-8">Related Articles</h2>
+      <RelatedPosts posts={relatedPosts} {locale} />
+    </section>
+  )}
+</BaseLayout>

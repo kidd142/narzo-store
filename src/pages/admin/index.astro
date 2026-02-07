@@ -1,0 +1,40 @@
+---
+// src/pages/admin/index.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/auth';
+
+const redirect = await requireAdmin(Astro);
+if (redirect) return redirect;
+
+const db = Astro.locals.runtime.env.DB;
+
+const [posts, products, views, revenue] = await Promise.all([
+  db.prepare('SELECT COUNT(*) as c FROM posts WHERE published=1').first(),
+  db.prepare('SELECT COUNT(*) as c FROM products WHERE is_active=1').first(),
+  db.prepare("SELECT COUNT(*) as c FROM page_views WHERE created_at >= date('now')").first(),
+  db.prepare("SELECT SUM(amount) as t FROM transactions WHERE status='paid'").first()
+]);
+---
+
+<AdminLayout title="Dashboard">
+  <h1 class="text-3xl font-bold mb-8">Dashboard</h1>
+  
+  <div class="grid md:grid-cols-4 gap-6 mb-8">
+    <div class="card bg-surface-50 p-6 rounded-xl border border-surface-100">
+      <p class="text-gray-500 text-sm">Published Posts</p>
+      <p class="text-3xl font-bold">{posts?.c || 0}</p>
+    </div>
+    <div class="card bg-surface-50 p-6 rounded-xl border border-surface-100">
+      <p class="text-gray-500 text-sm">Active Products</p>
+      <p class="text-3xl font-bold">{products?.c || 0}</p>
+    </div>
+    <div class="card bg-surface-50 p-6 rounded-xl border border-surface-100">
+      <p class="text-gray-500 text-sm">Views Today</p>
+      <p class="text-3xl font-bold">{views?.c || 0}</p>
+    </div>
+    <div class="card bg-surface-50 p-6 rounded-xl border border-surface-100">
+      <p class="text-gray-500 text-sm">Total Revenue</p>
+      <p class="text-3xl font-bold">Rp {(revenue?.t || 0).toLocaleString()}</p>
+    </div>
+  </div>
+</AdminLayout>

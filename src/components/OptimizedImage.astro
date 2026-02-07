@@ -1,0 +1,58 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  class: className,
+  fit = 'cover'
+} = Astro.props;
+
+// Helper to construct Cloudflare Image Resizing URL
+function getOptimizedUrl(url: string, w?: number, h?: number, f?: string) {
+  // Only optimize in production/preview
+  if (import.meta.env.DEV) return url;
+  
+  // Don't optimize data URLs or local paths that aren't absolute URLs
+  // (Assuming src is a full URL for external images, or /path for local)
+  // Cloudflare Image Resizing usually requires a full URL source or relative path if on same domain
+  
+  const options = [];
+  if (w) options.push(`width=${w}`);
+  if (h) options.push(`height=${h}`);
+  if (f) options.push(`fit=${f}`);
+  options.push('format=auto');
+  options.push('quality=80');
+  
+  const optionsString = options.join(',');
+  
+  if (url.startsWith('http')) {
+    return `/cdn-cgi/image/${optionsString}/${url}`;
+  } else {
+    // For local assets, we need to ensure they are accessible
+    // Usually /image.jpg -> /cdn-cgi/image/width=.../image.jpg
+    return `/cdn-cgi/image/${optionsString}${url}`;
+  }
+}
+
+const optimizedSrc = getOptimizedUrl(src, width, height, fit);
+---
+
+<img 
+  src={optimizedSrc} 
+  alt={alt} 
+  width={width} 
+  height={height} 
+  class={className} 
+  loading="lazy" 
+  decoding="async" 
+/>

@@ -1,0 +1,48 @@
+---
+// src/pages/admin/categories.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/auth';
+
+const redirect = await requireAdmin(Astro);
+if (redirect) return redirect;
+
+const db = Astro.locals.runtime.env.DB;
+const categories = await db.prepare(
+  'SELECT * FROM categories ORDER BY sort_order'
+).all();
+---
+
+<AdminLayout title="Categories">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Categories</h1>
+    <a href="/admin/categories/new" class="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg font-medium">+ New Category</a>
+  </div>
+  
+  <div class="card overflow-x-auto bg-surface-50 p-6 rounded-xl border border-surface-100">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-surface-100">
+          <th class="text-left py-3">Name (ID)</th>
+          <th class="text-left py-3">Name (EN)</th>
+          <th class="text-left py-3">Slug</th>
+          <th class="text-left py-3">Order</th>
+          <th class="text-left py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {categories.results.map(cat => (
+          <tr class="border-b border-surface-100 last:border-0">
+            <td class="py-3 font-medium">{cat.name_id}</td>
+            <td class="py-3 text-gray-400">{cat.name_en || '-'}</td>
+            <td class="py-3 text-gray-500">{cat.slug}</td>
+            <td class="py-3">{cat.sort_order}</td>
+            <td class="py-3 space-x-2">
+              <a href={`/admin/categories/${cat.id}`} class="text-accent hover:underline">Edit</a>
+              <button class="text-red-400 hover:text-red-300" onclick={`deleteCategory('${cat.id}')`}>Delete</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

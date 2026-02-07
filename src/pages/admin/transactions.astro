@@ -1,0 +1,54 @@
+---
+// src/pages/admin/transactions.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/auth';
+
+const redirect = await requireAdmin(Astro);
+if (redirect) return redirect;
+
+const db = Astro.locals.runtime.env.DB;
+const transactions = await db.prepare(
+  'SELECT * FROM transactions ORDER BY created_at DESC LIMIT 50'
+).all();
+---
+
+<AdminLayout title="Transactions">
+  <h1 class="text-3xl font-bold mb-8">Transactions</h1>
+  
+  <div class="card overflow-x-auto bg-surface-50 p-6 rounded-xl border border-surface-100">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-surface-100">
+          <th class="text-left py-3">ID</th>
+          <th class="text-left py-3">Amount</th>
+          <th class="text-left py-3">Status</th>
+          <th class="text-left py-3">Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {transactions.results.length === 0 ? (
+            <tr><td colspan="4" class="py-4 text-center text-gray-500">No transactions found</td></tr>
+        ) : (
+            transactions.results.map(tx => (
+            <tr class="border-b border-surface-100 last:border-0">
+                <td class="py-3 font-mono text-sm">{tx.id}</td>
+                <td class="py-3">Rp {tx.amount.toLocaleString()}</td>
+                <td class="py-3">
+                <span class={`px-2 py-1 rounded text-xs ${
+                    tx.status === 'paid' ? 'bg-green-500/20 text-green-400' : 
+                    tx.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' : 
+                    'bg-red-500/20 text-red-400'
+                }`}>
+                    {tx.status}
+                </span>
+                </td>
+                <td class="py-3 text-gray-400 text-sm">
+                    {new Date(tx.created_at).toLocaleDateString('id-ID')}
+                </td>
+            </tr>
+            ))
+        )}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

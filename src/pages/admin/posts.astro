@@ -1,0 +1,52 @@
+---
+// src/pages/admin/posts.astro
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../lib/auth';
+
+const redirect = await requireAdmin(Astro);
+if (redirect) return redirect;
+
+const db = Astro.locals.runtime.env.DB;
+const posts = await db.prepare(
+  'SELECT * FROM posts ORDER BY created_at DESC'
+).all();
+---
+
+<AdminLayout title="Posts">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold">Posts</h1>
+    <a href="/admin/posts/new" class="bg-accent hover:bg-accent-hover text-white px-4 py-2 rounded-lg font-medium">+ New Post</a>
+  </div>
+  
+  <div class="card overflow-x-auto bg-surface-50 p-6 rounded-xl border border-surface-100">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-surface-100">
+          <th class="text-left py-3">Title</th>
+          <th class="text-left py-3">Category</th>
+          <th class="text-left py-3">Status</th>
+          <th class="text-left py-3">Views</th>
+          <th class="text-left py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {posts.results.map(post => (
+          <tr class="border-b border-surface-100 last:border-0">
+            <td class="py-3 font-medium">{post.title_id}</td>
+            <td class="py-3 text-gray-400">{post.category}</td>
+            <td class="py-3">
+              <span class={`px-2 py-1 rounded text-xs ${post.published ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                {post.published ? 'Published' : 'Draft'}
+              </span>
+            </td>
+            <td class="py-3 text-gray-400">{post.views || 0}</td>
+            <td class="py-3 space-x-2">
+              <a href={`/admin/posts/${post.id}`} class="text-accent hover:underline">Edit</a>
+              <button class="text-red-400 hover:text-red-300" onclick={`deletePost('${post.id}')`}>Delete</button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</AdminLayout>

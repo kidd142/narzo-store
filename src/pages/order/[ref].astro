@@ -1,0 +1,90 @@
+
+---
+// src/pages/order/[ref].astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const { ref } = Astro.params;
+const db = Astro.locals.runtime.env.DB;
+
+const tx = await db.prepare(`
+  SELECT t.*, p.name_id, p.name_en, p.is_digital, t.download_token, t.downloads_used, t.max_downloads
+  FROM transactions t
+  LEFT JOIN products p ON t.product_id = p.id
+  WHERE t.reference = ?
+`).bind(ref).first();
+---
+
+<BaseLayout title="Order Status">
+  <div class="container mx-auto px-4 py-12 max-w-lg">
+    {tx ? (
+      <div class="card">
+        <div class="flex items-center justify-between mb-6">
+          <h1 class="text-2xl font-bold">Order #{ref}</h1>
+          <span class={`badge ${
+            tx.status === 'paid' ? 'badge-success' :
+            tx.status === 'expired' ? 'badge-error' :
+            'badge-warning'
+          }`}>
+            {tx.status.toUpperCase()}
+          </span>
+        </div>
+        
+        <dl class="space-y-4">
+          <div>
+            <dt class="text-sm text-gray-500">Product</dt>
+            <dd class="font-medium">{tx.name_id}</dd>
+          </div>
+          <div>
+            <dt class="text-sm text-gray-500">Amount</dt>
+            <dd class="font-medium text-accent">Rp {tx.amount.toLocaleString()}</dd>
+          </div>
+          <div>
+            <dt class="text-sm text-gray-500">Email</dt>
+            <dd class="font-medium">{tx.customer_email}</dd>
+          </div>
+          <div>
+            <dt class="text-sm text-gray-500">Date</dt>
+            <dd class="font-medium">{tx.created_at}</dd>
+          </div>
+        </dl>
+        
+        {tx.status === 'paid' && tx.is_digital && tx.download_token && (
+          <div class="mt-6 pt-6 border-t border-surface-100">
+            <a href={`/api/download/${tx.download_token}`} class="btn-primary w-full text-center">
+              Download Product
+            </a>
+            <p class="text-sm text-gray-500 mt-2">
+              {tx.downloads_used}/{tx.max_downloads} downloads used
+            </p>
+          </div>
+        )}
+        
+        {tx.status === 'pending' && (
+          <div class="mt-6">
+            <div class="alert-warning">
+              <p>Waiting for payment...</p>
+              <!-- Assuming we have a payment_url stored or reconstruct it -->
+              {/* For Tripay, we usually get a checkout_url. If we didn't store it, we might need to regenerate or just show "Check your email/history" */}
+              <p class="text-sm mt-2">Please complete your payment via the link provided during checkout.</p>
+            </div>
+          </div>
+        )}
+      </div>
+    ) : (
+      <div class="empty-state">
+        <span class="text-4xl mb-4">🔍</span>
+        <h2 class="text-xl font-bold mb-2">Order not found</h2>
+        <p class="text-gray-500">Please check your reference number</p>
+      </div>
+    )}
+    
+    <!-- Order lookup form -->
+    <div class="card mt-8">
+      <h3 class="font-bold mb-4">Check Another Order</h3>
+      <form action="/order" method="get" class="flex gap-2">
+        <input type="text" name="ref" placeholder="Order reference" class="input flex-1" required />
+        <button type="submit" class="btn-primary">Check</button>
+      </form>
+    </div>
+  </div>
+</BaseLayout>

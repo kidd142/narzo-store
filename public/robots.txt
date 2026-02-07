@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://narzo.store/sitemap.xml

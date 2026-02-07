@@ -1,0 +1,128 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import OptimizedImage from '../components/OptimizedImage.astro';
+import { getPosts, getProducts } from '../lib/db';
+
+const db = Astro.locals?.runtime?.env?.DB;
+const locale = Astro.currentLocale || 'id';
+
+const featuredArticles = await getPosts(db, { limit: 3, featured: true });
+const featuredProducts = await getProducts(db, 4);
+
+// Helper for localized text
+const getLocalized = (obj: any, key: string) => {
+  return obj[`${key}_${locale}`] || obj[`${key}_id`] || '';
+};
+---
+
+<BaseLayout title="Home" description="Narzo Store - Top Up Games & Voucher Termurah">
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 z-0 pointer-events-none">
+      <div class="absolute inset-0 bg-grid-pattern opacity-20"></div>
+      <div class="absolute -top-20 -left-20 w-96 h-96 bg-accent/20 rounded-full blur-[100px] animate-pulse-slow"></div>
+      <div class="absolute -bottom-20 -right-20 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px] animate-pulse-slow" style="animation-delay: 1.5s;"></div>
+    </div>
+    
+    <div class="container mx-auto px-4 relative z-10 text-center">
+      <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent drop-shadow-lg">
+        Narzo Store
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto drop-shadow-md">
+        Platform Top Up Game & Voucher Digital Terpercaya, Cepat, dan Aman.
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a href="/products" class="px-8 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-primary/50">
+          Belanja Sekarang
+        </a>
+        <a href="/about" class="px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg font-semibold transition-all border border-white/10">
+          Tentang Kami
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="container mx-auto px-4 py-16">
+    <div class="flex justify-between items-end mb-8">
+      <div>
+        <h2 class="text-3xl font-bold mb-2">Produk Unggulan</h2>
+        <p class="text-gray-400">Pilihan terbaik untuk gamers</p>
+      </div>
+      <a href="/products" class="text-primary hover:text-accent transition-colors font-medium">Lihat Semua →</a>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {featuredProducts.map((product) => (
+        <a href={`/products/${product.slug}`} class="group bg-surface-light rounded-xl overflow-hidden hover:transform hover:-translate-y-1 transition-all duration-300 border border-white/5 hover:border-primary/50 shadow-md hover:shadow-xl">
+          <div class="aspect-[4/3] overflow-hidden relative">
+            <OptimizedImage 
+              src={product.image_url || '/images/placeholder-product.jpg'} 
+              alt={getLocalized(product, 'name')}
+              width={400}
+              height={300}
+              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{getLocalized(product, 'name')}</h3>
+            <p class="text-accent font-medium">Rp {product.price.toLocaleString('id-ID')}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Featured Articles -->
+  <section class="bg-surface-dark py-16 border-y border-white/5">
+    <div class="container mx-auto px-4">
+      <div class="flex justify-between items-end mb-8">
+        <div>
+          <h2 class="text-3xl font-bold mb-2">Artikel Terbaru</h2>
+          <p class="text-gray-400">Tips, trik, dan berita gaming terkini</p>
+        </div>
+        <a href="/blog" class="text-primary hover:text-accent transition-colors font-medium">Lihat Semua →</a>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {featuredArticles.map((article) => (
+          <a href={`/blog/${article.slug}`} class="group block bg-surface rounded-xl overflow-hidden hover:shadow-lg transition-all border border-white/5">
+            <div class="aspect-video overflow-hidden">
+              <OptimizedImage 
+                src={article.cover_image || '/images/placeholder-article.jpg'} 
+                alt={getLocalized(article, 'title')}
+                width={600}
+                height={338}
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div class="p-5">
+              <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                {getLocalized(article, 'title')}
+              </h3>
+              <p class="text-sm text-gray-500">Baca selengkapnya →</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="container mx-auto px-4 py-20 text-center">
+    <div class="relative overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-12 border border-white/10 shadow-2xl">
+      <div class="absolute top-0 left-0 w-full h-full bg-grid-white/[0.05] [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
+      <div class="relative z-10">
+        <h2 class="text-3xl md:text-5xl font-bold mb-6">Siap untuk Top Up?</h2>
+        <p class="text-gray-300 mb-8 max-w-2xl mx-auto text-lg">
+          Bergabunglah dengan ribuan gamers lainnya. Dapatkan harga terbaik dan proses instan hanya di Narzo Store.
+        </p>
+        <a href="/products" class="inline-block px-10 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/50 transition-all transform hover:scale-105">
+          Mulai Top Up Sekarang
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

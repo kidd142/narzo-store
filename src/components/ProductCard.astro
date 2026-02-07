@@ -1,0 +1,55 @@
+
+---
+import type { Product } from '../lib/db';
+import { t } from '../lib/i18n';
+
+interface Props {
+  product: Product;
+  locale: string;
+}
+
+const { product, locale } = Astro.props;
+const name = t({ id: product.name_id, en: product.name_en }, locale);
+
+// Stock status (with defaults for mock data)
+const stock = (product as any).stock ?? -1;
+const sold = (product as any).sold ?? 0;
+const isUnlimited = stock === -1;
+const inStock = isUnlimited || stock > 0;
+const lowStock = !isUnlimited && stock > 0 && stock <= 5;
+---
+
+<article class={`card group ${!inStock ? 'opacity-60' : ''}`}>
+  <div class="relative">
+    {product.image_url && (
+      <img src={product.image_url} alt={name}
+           class="w-full h-48 object-cover rounded-lg mb-4" />
+    )}
+    
+    <!-- Badges -->
+    <div class="absolute top-2 left-2 flex flex-col gap-1">
+      {product.is_digital ? (
+        <span class="badge-info">Digital</span>
+      ) : null}
+      {!inStock && (
+        <span class="badge-error">Sold Out</span>
+      )}
+      {lowStock && (
+        <span class="badge-warning">Only {stock} left</span>
+      )}
+    </div>
+  </div>
+  
+  <h3 class="text-lg font-semibold mb-2 group-hover:text-accent transition-colors">
+    <a href={`/products/${product.slug}`}>{name}</a>
+  </h3>
+  
+  <div class="flex items-center justify-between">
+    <p class="text-2xl font-bold text-accent">
+      Rp {product.price.toLocaleString()}
+    </p>
+    {sold > 0 && (
+      <span class="text-sm text-gray-500">{sold} sold</span>
+    )}
+  </div>
+</article>

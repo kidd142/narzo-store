@@ -1,0 +1,31 @@
+---
+import type { Post } from '../lib/db';
+import { t } from '../lib/i18n';
+
+interface Props {
+  post: Post;
+  locale: string;
+}
+
+const { post, locale } = Astro.props;
+const title = t({ id: post.title_id, en: post.title_en }, locale);
+const excerpt = t({ id: post.excerpt_id, en: post.excerpt_en }, locale);
+---
+
+<article class="card group">
+  {post.cover_image && (
+    <img src={post.cover_image} alt={title}
+         class="w-full h-48 object-cover rounded-lg mb-4" />
+  )}
+  
+  <h3 class="text-xl font-semibold mb-2 group-hover:text-accent transition-colors">
+    <a href={`/blog/${post.slug}`}>{title}</a>
+  </h3>
+  
+  {excerpt && <p class="text-gray-400 line-clamp-2">{excerpt}</p>}
+  
+  <div class="mt-4 flex justify-between text-sm text-gray-500">
+    <span>{post.category}</span>
+    <span>{post.views} views</span>
+  </div>
+</article>

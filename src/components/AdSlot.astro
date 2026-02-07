@@ -1,0 +1,68 @@
+---
+// src/components/AdSlot.astro
+interface Props {
+  slot: 'header' | 'sidebar' | 'in-article' | 'footer';
+  class?: string;
+}
+
+const { slot, class: className = '' } = Astro.props;
+
+// Get config from environment
+const publisherId = import.meta.env.ADSENSE_PUBLISHER_ID;
+const enabled = import.meta.env.ADSENSE_ENABLED === 'true';
+
+// Slot-specific IDs
+const slotIds: Record<string, string | undefined> = {
+  'header': import.meta.env.ADSENSE_HEADER_SLOT,
+  'sidebar': import.meta.env.ADSENSE_SIDEBAR_SLOT,
+  'in-article': import.meta.env.ADSENSE_ARTICLE_SLOT,
+  'footer': import.meta.env.ADSENSE_FOOTER_SLOT,
+};
+
+const adSlotId = slotIds[slot];
+
+// Don't render if not configured
+if (!enabled || !publisherId) {
+  return null;
+}
+---
+
+<div class={`ad-container ${className}`}>
+  {adSlotId ? (
+    <>
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client={publisherId}
+           data-ad-slot={adSlotId}
+           data-ad-format="auto"
+           data-full-width-responsive="true">
+      </ins>
+      <script is:inline>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
+    </>
+  ) : (
+    <!-- Auto ads fallback - no specific slot -->
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client={publisherId}
+         data-ad-format="auto"
+         data-full-width-responsive="true">
+    </ins>
+    <script is:inline>
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+  )}
+</div>
+
+<style>
+  .ad-container {
+    min-height: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ad-container:empty {
+    display: none;
+  }
+</style>

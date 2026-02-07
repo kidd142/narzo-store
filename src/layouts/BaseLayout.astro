@@ -1,0 +1,70 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import AdSlot from '../components/AdSlot.astro';
+import SEO from '../components/SEO.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  showHeaderAd?: boolean;
+  showFooterAd?: boolean;
+}
+
+const { 
+  title, 
+  description = "Narzo Store - Top Up Games & Digital Vouchers Terpercaya",
+  image,
+  showHeaderAd = true,
+  showFooterAd = true
+} = Astro.props;
+
+const adsenseId = import.meta.env.ADSENSE_PUBLISHER_ID;
+const adsEnabled = import.meta.env.ADSENSE_ENABLED === 'true';
+---
+
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <SEO title={title} description={description} image={image} />
+  
+  <!-- Preconnect & DNS Prefetch -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://imagedelivery.net" />
+  <link rel="dns-prefetch" href="https://imagedelivery.net" />
+  
+  <!-- Adsense (only if configured) -->
+  {adsEnabled && adsenseId && (
+    <script async 
+      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
+      crossorigin="anonymous">
+    </script>
+  )}
+</head>
+<body class="min-h-screen flex flex-col text-gray-100 selection:bg-accent selection:text-white">
+  <Header />
+  
+  <!-- Header Ad -->
+  {showHeaderAd && (
+    <div class="container mx-auto px-4 py-2">
+      <AdSlot slot="header" />
+    </div>
+  )}
+  
+  <main class="flex-1">
+    <slot />
+  </main>
+  
+  <!-- Footer Ad -->
+  {showFooterAd && (
+    <div class="container mx-auto px-4 py-2">
+      <AdSlot slot="footer" />
+    </div>
+  )}
+  
+  <Footer />
+</body>
+</html>

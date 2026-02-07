@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArticleCard from '../../../components/ArticleCard.astro';
+import { getPosts } from '../../../lib/db';
+import type { D1Database } from '@cloudflare/workers-types';
+
+const { slug } = Astro.params;
+const db = Astro.locals.runtime.env.DB;
+const locale = Astro.currentLocale || 'id';
+
+// Get category info
+const category = await db.prepare(
+  'SELECT * FROM categories WHERE slug = ?'
+).bind(slug).first<{ name_id: string; name_en: string | null }>();
+
+if (!category) return Astro.redirect('/404');
+
+// Get posts in category
+const posts = await getPosts(db, { category: slug, limit: 20 });
+const categoryName = locale === 'en' && category.name_en ? category.name_en : category.name_id;
+---
+
+<BaseLayout title={`Category: ${categoryName}`}>
+  <div class="container mx-auto px-4 py-12">
+    <nav class="mb-4 text-sm text-gray-500">
+      <a href="/blog" class="hover:text-accent">Blog</a>
+      <span class="mx-2">/</span>
+      <span>{categoryName}</span>
+    </nav>
+    
+    <h1 class="text-4xl font-bold mb-8">{categoryName}</h1>
+    
+    <div class="grid md:grid-cols-3 gap-6">
+      {posts.map(post => (
+        <ArticleCard post={post} locale={locale} />
+      ))}
+    </div>
+    
+    {posts.length === 0 && (
+      <p class="text-gray-500 text-center py-12">
+        No articles in this category.
+      </p>
+    )}
+  </div>
+</BaseLayout>

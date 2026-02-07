@@ -1,0 +1,71 @@
+
+---
+// src/pages/checkout/[id].astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../lib/i18n';
+
+const { id } = Astro.params;
+const db = Astro.locals.runtime.env.DB;
+const product = await db.prepare(
+  'SELECT * FROM products WHERE id = ? AND is_active = 1'
+).bind(id).first();
+
+if (!product) return Astro.redirect('/products');
+
+// Check payment config
+const paymentEnabled = !!Astro.locals.runtime.env.TRIPAY_API_KEY;
+if (!paymentEnabled) return Astro.redirect(`/products/${product.slug}`);
+
+const locale = Astro.currentLocale || 'id';
+const name = t({ id: product.name_id, en: product.name_en }, locale);
+---
+
+<BaseLayout title={`Checkout: ${name}`} showHeaderAd={false} showFooterAd={false}>
+  <div class="container mx-auto px-4 py-12 max-w-lg">
+    <h1 class="text-3xl font-bold mb-8">Checkout</h1>
+    
+    <!-- Order Summary -->
+    <div class="card mb-6">
+      <h2 class="font-semibold mb-4">Order Summary</h2>
+      <div class="flex justify-between items-center">
+        <span>{name}</span>
+        <span class="font-bold">Rp {product.price.toLocaleString()}</span>
+      </div>
+    </div>
+    
+    <!-- Checkout Form -->
+    <form method="POST" action="/api/checkout" class="card space-y-4">
+      <input type="hidden" name="product_id" value={id} />
+      
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Nama</label>
+        <input type="text" name="name" required
+               class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg" />
+      </div>
+      
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Email</label>
+        <input type="email" name="email" required
+               class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg" />
+      </div>
+      
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Metode Pembayaran</label>
+        <select name="method" required
+                class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg">
+          <option value="QRIS">QRIS (All E-Wallet)</option>
+          <option value="DANA">DANA</option>
+          <option value="OVO">OVO</option>
+          <option value="GOPAY">GoPay</option>
+          <option value="SHOPEEPAY">ShopeePay</option>
+          <option value="BRIVA">BRI Virtual Account</option>
+          <option value="BCAVA">BCA Virtual Account</option>
+        </select>
+      </div>
+      
+      <button type="submit" class="btn-primary w-full">
+        Bayar Rp {product.price.toLocaleString()}
+      </button>
+    </form>
+  </div>
+</BaseLayout>

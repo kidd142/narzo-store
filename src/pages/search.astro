@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import type { Post } from '../lib/db';
+
+const query = Astro.url.searchParams.get('q') || '';
+const db = Astro.locals.runtime.env.DB;
+const locale = Astro.currentLocale || 'id';
+
+let results: Post[] = [];
+if (query.length >= 2) {
+  const q = `%${query}%`;
+  const r = await db.prepare(`
+    SELECT * FROM posts WHERE published = 1 
+    AND (title_id LIKE ? OR title_en LIKE ?)
+    ORDER BY views DESC LIMIT 20
+  `).bind(q, q).all<Post>();
+  results = r.results;
+}
+---
+
+<BaseLayout title={`Search: ${query}`}>
+  <div class="container mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">Search</h1>
+    
+    <form action="/search" method="GET" class="mb-8">
+      <input type="search" name="q" value={query}
+             placeholder="Cari artikel..."
+             class="w-full md:w-96 px-4 py-3 bg-surface-50 border border-surface-100 
+                    rounded-lg focus:outline-none focus:border-accent" />
+    </form>
+    
+    {query && <p class="text-gray-500 mb-6">{results.length} hasil</p>}
+    
+    <div class="grid md:grid-cols-3 gap-6">
+      {results.map(post => <ArticleCard post={post} locale={locale} />)}
+    </div>
+  </div>
+</BaseLayout>

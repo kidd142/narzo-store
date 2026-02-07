@@ -1,0 +1,64 @@
+---
+// src/pages/products/[slug].astro
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getProductBySlug } from '../../lib/db';
+import { t } from '../../lib/i18n';
+
+const { slug } = Astro.params;
+const db = Astro.locals?.runtime?.env?.DB || null;
+const product = await getProductBySlug(db, slug!);
+
+if (!product) return Astro.redirect('/404');
+
+const locale = Astro.currentLocale || 'id';
+const name = t({ id: product.name_id, en: product.name_en }, locale);
+const desc = t({ id: product.description_id, en: product.description_en }, locale);
+
+// Check if payment is configured
+const paymentEnabled = !!Astro.locals?.runtime?.env?.TRIPAY_API_KEY;
+---
+
+<BaseLayout title={name}>
+  <div class="container mx-auto px-4 py-12">
+    <div class="grid md:grid-cols-2 gap-12">
+      <!-- Image -->
+      <div>
+        {product.image_url ? (
+          <img src={product.image_url} alt={name}
+               class="w-full rounded-xl" />
+        ) : (
+          <div class="w-full aspect-square bg-surface-50 rounded-xl flex items-center justify-center">
+            <span class="text-gray-500">No Image</span>
+          </div>
+        )}
+      </div>
+      
+      <!-- Details -->
+      <div>
+        <h1 class="text-4xl font-bold mb-4">{name}</h1>
+        
+        <p class="text-3xl font-bold text-accent mb-6">
+          Rp {product.price.toLocaleString()}
+        </p>
+        
+        {desc && <p class="text-gray-400 mb-8">{desc}</p>}
+        
+        {paymentEnabled ? (
+          <a href={`/checkout/${product.id}`} class="btn-primary inline-block">
+            Beli Sekarang
+          </a>
+        ) : (
+          <span class="inline-block px-6 py-3 bg-surface-50 rounded-lg text-gray-500">
+            Coming Soon
+          </span>
+        )}
+        
+        {product.is_digital && (
+          <p class="mt-4 text-sm text-gray-500">
+            🔗 Digital product - link akan dikirim via email
+          </p>
+        )}
+      </div>
+    </div>
+  </div>
+</BaseLayout>

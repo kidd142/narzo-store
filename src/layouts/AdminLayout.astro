@@ -1,0 +1,66 @@
+---
+// src/layouts/AdminLayout.astro
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title} | Admin</title>
+</head>
+<body class="min-h-screen bg-surface text-gray-100">
+  <div class="flex">
+    <!-- Sidebar -->
+    <aside class="w-64 min-h-screen bg-surface-50 border-r border-surface-100 p-4">
+      <h2 class="text-xl font-bold mb-6">Admin Panel</h2>
+      <nav class="space-y-2">
+        <a href="/admin" class="block px-4 py-2 rounded hover:bg-surface-100">Dashboard</a>
+        <a href="/admin/posts" class="block px-4 py-2 rounded hover:bg-surface-100">Posts</a>
+        <a href="/admin/categories" class="block px-4 py-2 rounded hover:bg-surface-100">Categories</a>
+        <a href="/admin/products" class="block px-4 py-2 rounded hover:bg-surface-100">Products</a>
+        <a href="/admin/transactions" class="block px-4 py-2 rounded hover:bg-surface-100">Transactions</a>
+        <hr class="border-surface-100 my-4" />
+        <a href="/" class="block px-4 py-2 rounded hover:bg-surface-100">← Back to Site</a>
+        <form action="/api/auth/logout" method="POST">
+          <button class="w-full text-left px-4 py-2 rounded hover:bg-red-500/20 text-red-400">
+            Logout
+          </button>
+        </form>
+      </nav>
+    </aside>
+    
+    <!-- Content -->
+    <main class="flex-1 p-8">
+      <slot />
+    </main>
+  </div>
+  
+  <script is:inline>
+    async function deletePost(id) {
+      if (!confirm('Delete this post?')) return;
+      await fetch('/api/admin/posts', { method: 'DELETE', body: JSON.stringify({ id }) });
+      location.reload();
+    }
+    
+    async function deleteProduct(id) {
+      if (!confirm('Delete this product?')) return;
+      await fetch('/api/admin/products', { method: 'DELETE', body: JSON.stringify({ id }) });
+      location.reload();
+    }
+    
+    async function deleteCategory(id) {
+      if (!confirm('Delete this category?')) return;
+      await fetch('/api/admin/categories', { method: 'DELETE', body: JSON.stringify({ id }) });
+      location.reload();
+    }
+  </script>
+</body>
+</html>

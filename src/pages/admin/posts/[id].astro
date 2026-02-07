@@ -1,0 +1,253 @@
+---
+// src/pages/admin/posts/[id].astro
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../../lib/auth';
+
+const redirect = await requireAdmin(Astro);
+if (redirect) return redirect;
+
+const { id } = Astro.params;
+const db = Astro.locals.runtime.env.DB;
+const isNew = id === 'new';
+
+let post = null;
+if (!isNew) {
+  post = await db.prepare('SELECT * FROM posts WHERE id = ?').bind(id).first();
+  if (!post) return Astro.redirect('/admin/posts');
+}
+
+// Get categories for dropdown
+const categories = await db.prepare('SELECT * FROM categories ORDER BY sort_order').all();
+---
+
+<AdminLayout title={isNew ? 'New Post' : 'Edit Post'}>
+  <h1 class="text-3xl font-bold mb-8">{isNew ? 'New Post' : 'Edit Post'}</h1>
+  
+  <form method="POST" action="/api/admin/posts" enctype="multipart/form-data" 
+        class="bg-surface-50 p-6 rounded-xl border border-surface-100 max-w-4xl space-y-6">
+    <input type="hidden" name="id" value={post?.id || crypto.randomUUID()} />
+    
+    <!-- Title Section -->
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Title (ID) *</label>
+        <input type="text" name="title_id" value={post?.title_id || ''} required
+               class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Title (EN)</label>
+        <input type="text" name="title_en" value={post?.title_en || ''}
+               class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+      </div>
+    </div>
+    
+    <!-- Slug & Category -->
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Slug *</label>
+        <input type="text" name="slug" value={post?.slug || ''} required
+               id="slug-input"
+               class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+      </div>
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Category</label>
+        <select name="category" 
+                class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none">
+          <option value="">-- No Category --</option>
+          {categories.results.map(cat => (
+            <option value={cat.slug} selected={post?.category === cat.slug}>
+              {cat.name_id}
+            </option>
+          ))}
+        </select>
+      </div>
+    </div>
+    
+    <!-- Cover Image -->
+    <div>
+      <label class="block text-sm text-gray-400 mb-1">Cover Image</label>
+      <div class="flex gap-4 items-start">
+        <div class="flex-1">
+          <input type="file" name="cover_file" accept="image/*" id="cover-file"
+                 class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+          <input type="hidden" name="cover_image" id="cover-url" value={post?.cover_image || ''} />
+        </div>
+        {post?.cover_image && (
+          <img src={post.cover_image} alt="Cover" id="cover-preview"
+               class="w-24 h-24 object-cover rounded-lg" />
+        )}
+      </div>
+      <p class="text-xs text-gray-500 mt-1">Max 5MB. JPG, PNG, WebP</p>
+    </div>
+    
+    <!-- Excerpt -->
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Excerpt (ID)</label>
+        <textarea name="excerpt_id" rows="2"
+                  class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none"
+        >{post?.excerpt_id || ''}</textarea>
+      </div>
+      <div>
+        <label class="block text-sm text-gray-400 mb-1">Excerpt (EN)</label>
+        <textarea name="excerpt_en" rows="2"
+                  class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none"
+        >{post?.excerpt_en || ''}</textarea>
+      </div>
+    </div>
+    
+    <!-- Content with Rich Text Editor -->
+    <div>
+      <label class="block text-sm text-gray-400 mb-1">Content (ID) *</label>
+      <div id="editor-id" class="bg-surface border border-surface-100 rounded-lg min-h-[300px]"></div>
+      <input type="hidden" name="content_id" id="content-id-input" value={post?.content_id || ''} />
+    </div>
+    
+    <div>
+      <label class="block text-sm text-gray-400 mb-1">Content (EN)</label>
+      <div id="editor-en" class="bg-surface border border-surface-100 rounded-lg min-h-[200px]"></div>
+      <input type="hidden" name="content_en" id="content-en-input" value={post?.content_en || ''} />
+    </div>
+    
+    <!-- Tags -->
+    <div>
+      <label class="block text-sm text-gray-400 mb-1">Tags (comma separated)</label>
+      <input type="text" name="tags" value={post?.tags || ''} 
+             placeholder="tech, tutorial, coding"
+             class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+    </div>
+    
+    <!-- Options -->
+    <div class="flex flex-wrap items-center gap-6">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="published" value="1" checked={post?.published} class="w-4 h-4 text-accent bg-surface border-surface-100 rounded focus:ring-accent" />
+        <span>Published</span>
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="featured" value="1" checked={post?.featured} class="w-4 h-4 text-accent bg-surface border-surface-100 rounded focus:ring-accent" />
+        <span>Featured</span>
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="checkbox" name="enable_ads" value="1" checked={post?.enable_ads !== 0} class="w-4 h-4 text-accent bg-surface border-surface-100 rounded focus:ring-accent" />
+        <span>Enable Ads</span>
+      </label>
+    </div>
+    
+    <!-- Submit -->
+    <div class="flex gap-4">
+      <button type="submit" class="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-medium transition-colors">Save Post</button>
+      <a href="/admin/posts" class="px-6 py-3 border border-surface-100 rounded-lg text-gray-300 hover:text-white transition-colors">Cancel</a>
+    </div>
+  </form>
+</AdminLayout>
+
+<!-- Quill Editor -->
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<script is:inline src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+<script is:inline>
+  // Auto-generate slug from title
+  const titleInput = document.querySelector('[name="title_id"]');
+  if (titleInput) {
+    titleInput.addEventListener('input', (e) => {
+      const slug = e.target.value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      const slugInput = document.getElementById('slug-input');
+      if (slugInput && !slugInput.value) { // Only update if empty or user hasn't manually edited (simplified check)
+          slugInput.value = slug;
+      } else if (slugInput && document.activeElement === titleInput) {
+          // If user is typing title and hasn't manually focused slug, update it.
+          // Ideally we track if slug was manually changed, but this is a simple version.
+          slugInput.value = slug;
+      }
+    });
+  }
+
+  // Initialize Quill editors
+  const editorId = new Quill('#editor-id', {
+    theme: 'snow',
+    placeholder: 'Write your content here...',
+    modules: {
+      toolbar: [
+        [{ 'header': [1, 2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        ['blockquote', 'code-block'],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['link', 'image'],
+        ['clean']
+      ]
+    }
+  });
+  
+  const contentIdInput = document.getElementById('content-id-input');
+  if (contentIdInput) {
+      editorId.root.innerHTML = contentIdInput.value;
+  }
+
+  const editorEn = new Quill('#editor-en', {
+    theme: 'snow',
+    placeholder: 'English content (optional)...',
+    modules: { toolbar: [['bold', 'italic', 'link']] }
+  });
+  
+  const contentEnInput = document.getElementById('content-en-input');
+  if (contentEnInput) {
+      editorEn.root.innerHTML = contentEnInput.value;
+  }
+
+  // Sync editor content before submit
+  const form = document.querySelector('form');
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      document.getElementById('content-id-input').value = editorId.root.innerHTML;
+      document.getElementById('content-en-input').value = editorEn.root.innerHTML;
+    });
+  }
+
+  // Image upload preview
+  const coverFile = document.getElementById('cover-file');
+  if (coverFile) {
+    coverFile.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const formData = new FormData();
+        formData.append('file', file);
+        
+        try {
+            const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+            if (!res.ok) throw new Error('Upload failed');
+            
+            const data = await res.json();
+            
+            if (data.url) {
+            document.getElementById('cover-url').value = data.url;
+            let preview = document.getElementById('cover-preview');
+            if (!preview) {
+                preview = document.createElement('img');
+                preview.id = 'cover-preview';
+                preview.className = 'w-24 h-24 object-cover rounded-lg mt-2';
+                // Insert after input parent div
+                e.target.parentNode.parentNode.appendChild(preview);
+            }
+            preview.src = data.url;
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Upload failed');
+        }
+    });
+  }
+</script>
+
+<style is:global>
+  .ql-toolbar { background: #171717; border-color: #262626 !important; }
+  .ql-container { border-color: #262626 !important; }
+  .ql-editor { color: #f3f4f6; min-height: 200px; }
+  .ql-editor.ql-blank::before { color: #6b7280; }
+  .ql-stroke { stroke: #d1d5db !important; }
+  .ql-fill { fill: #d1d5db !important; }
+  .ql-picker { color: #d1d5db !important; }
+</style>

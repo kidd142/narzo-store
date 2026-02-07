@@ -1,0 +1,55 @@
+---
+// src/pages/admin/categories/[id].astro
+import AdminLayout from '../../../layouts/AdminLayout.astro';
+import { requireAdmin } from '../../../lib/auth';
+
+const redirect = await requireAdmin(Astro);
+if (redirect) return redirect;
+
+const { id } = Astro.params;
+const db = Astro.locals.runtime.env.DB;
+const isNew = id === 'new';
+
+let category = null;
+if (!isNew) {
+  category = await db.prepare('SELECT * FROM categories WHERE id = ?').bind(id).first();
+  if (!category) return Astro.redirect('/admin/categories');
+}
+---
+
+<AdminLayout title={isNew ? 'New Category' : 'Edit Category'}>
+  <h1 class="text-3xl font-bold mb-8">{isNew ? 'New Category' : 'Edit Category'}</h1>
+  
+  <form method="POST" action="/api/admin/categories" class="bg-surface-50 p-6 rounded-xl border border-surface-100 max-w-lg space-y-4">
+    <input type="hidden" name="id" value={category?.id || crypto.randomUUID()} />
+    
+    <div>
+      <label class="block text-sm text-gray-400 mb-1">Name (ID) *</label>
+      <input type="text" name="name_id" value={category?.name_id || ''} required
+             class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+    </div>
+    
+    <div>
+      <label class="block text-sm text-gray-400 mb-1">Name (EN)</label>
+      <input type="text" name="name_en" value={category?.name_en || ''}
+             class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+    </div>
+    
+    <div>
+      <label class="block text-sm text-gray-400 mb-1">Slug *</label>
+      <input type="text" name="slug" value={category?.slug || ''} required
+             class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+    </div>
+    
+    <div>
+      <label class="block text-sm text-gray-400 mb-1">Sort Order</label>
+      <input type="number" name="sort_order" value={category?.sort_order || 0}
+             class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg focus:border-accent outline-none" />
+    </div>
+    
+    <div class="flex gap-4 pt-4">
+      <button type="submit" class="bg-accent hover:bg-accent-hover text-white px-6 py-3 rounded-lg font-medium transition-colors">Save</button>
+      <a href="/admin/categories" class="px-6 py-3 border border-surface-100 rounded-lg text-gray-300 hover:text-white transition-colors">Cancel</a>
+    </div>
+  </form>
+</AdminLayout>
