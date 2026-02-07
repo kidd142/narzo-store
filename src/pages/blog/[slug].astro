@@ -5,6 +5,7 @@ import ShareButtons from '../../components/ShareButtons.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
 import { getPostBySlug, getRelatedPosts, incrementViews } from '../../lib/db';
 import { t, translations } from '../../lib/i18n';
+import { injectAdsAfterH2, splitContentForAds } from '../../lib/content-ads';
 
 const { slug } = Astro.params;
 const db = Astro.locals.runtime.env.DB;
@@ -17,7 +18,7 @@ await incrementViews(db, post.id);
 const locale = (Astro.locals as any).locale || 'id';
 const tr = translations.blog;
 const title = t({ id: post.title_id, en: post.title_en }, locale);
-const content = t({ id: post.content_id, en: post.content_en }, locale);
+let content = t({ id: post.content_id, en: post.content_en }, locale);
 
 // Calculate reading time (avg 200 words per minute)
 const wordCount = content?.replace(/<[^>]*>/g, '').split(/\s+/).length || 0;
@@ -28,6 +29,14 @@ const relatedPosts = await getRelatedPosts(db, post.category, post.id, 3);
 
 const pageUrl = `${Astro.site}blog/${post.slug}`;
 const enableAds = post.enable_ads === 1;
+
+// Inject mid-article ads after 2nd H2 heading (if ads enabled and content is long enough)
+let contentSegments: string[] = [content || ''];
+if (enableAds && wordCount > 300) {
+  // Inject ad after the 2nd H2 (index 1)
+  const contentWithAds = injectAdsAfterH2(content || '', [1]);
+  contentSegments = splitContentForAds(contentWithAds);
+}
 ---
 
 <BaseLayout title={title} description={post.excerpt_id || ''} showHeaderAd={enableAds}>
@@ -53,10 +62,23 @@ const enableAds = post.enable_ads === 1;
         <!-- Share buttons -->
         <ShareButtons url={pageUrl} title={title} />
         
-        <!-- In-article ad (top) -->
-        {enableAds && <AdSlot slot="in-article" class="my-8" />}
+        <!-- In-article ad (top) - only for shorter articles -->
+        {enableAds && wordCount <= 300 && <AdSlot slot="in-article" class="my-8" />}
         
-        <div class="prose-dark mt-8" set:html={content} />
+        <!-- Article content with mid-article ads -->
+        <div class="prose-dark mt-8">
+          {contentSegments.map((segment, index) => (
+            <>
+              <Fragment set:html={segment} />
+              {/* Insert mid-article ad between segments (not after last) */}
+              {enableAds && index < contentSegments.length - 1 && (
+                <div class="my-8 py-4 border-y border-surface-100/30">
+                  <AdSlot slot="in-article" />
+                </div>
+              )}
+            </>
+          ))}
+        </div>
         
         <!-- In-article ad (bottom) -->
         {enableAds && <AdSlot slot="in-article" class="my-8" />}
@@ -93,6 +115,13 @@ const enableAds = post.enable_ads === 1;
     <section class="container mx-auto px-4 py-12 border-t border-surface-100">
       <h2 class="text-2xl font-bold mb-8">{t(tr.related, locale)}</h2>
       <RelatedPosts posts={relatedPosts} {locale} />
+    </section>
+  )}
+  
+  <!-- Multiplex Ad (recommendation-style ads) -->
+  {enableAds && (
+    <section class="container mx-auto px-4 py-8">
+      <AdSlot slot="multiplex" />
     </section>
   )}
 </BaseLayout>

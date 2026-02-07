@@ -1,7 +1,7 @@
 ---
 // src/components/AdSlot.astro
 interface Props {
-  slot: 'header' | 'sidebar' | 'in-article' | 'footer';
+  slot: 'header' | 'sidebar' | 'in-article' | 'footer' | 'multiplex';
   class?: string;
 }
 
@@ -17,9 +17,11 @@ const slotIds: Record<string, string | undefined> = {
   'sidebar': import.meta.env.ADSENSE_SIDEBAR_SLOT,
   'in-article': import.meta.env.ADSENSE_ARTICLE_SLOT,
   'footer': import.meta.env.ADSENSE_FOOTER_SLOT,
+  'multiplex': import.meta.env.ADSENSE_MULTIPLEX_SLOT,
 };
 
 const adSlotId = slotIds[slot];
+const isMultiplex = slot === 'multiplex';
 
 // Don't render if not configured
 if (!enabled || !publisherId) {
@@ -27,14 +29,14 @@ if (!enabled || !publisherId) {
 }
 ---
 
-<div class={`ad-container ${className}`}>
+<div class={`ad-container ${isMultiplex ? 'ad-multiplex' : ''} ${className}`}>
   {adSlotId ? (
     <>
       <ins class="adsbygoogle"
-           style="display:block"
+           style={isMultiplex ? "display:block" : "display:block"}
            data-ad-client={publisherId}
            data-ad-slot={adSlotId}
-           data-ad-format="auto"
+           data-ad-format={isMultiplex ? "autorelaxed" : "auto"}
            data-full-width-responsive="true">
       </ins>
       <script is:inline>
@@ -64,5 +66,8 @@ if (!enabled || !publisherId) {
   }
   .ad-container:empty {
     display: none;
+  }
+  .ad-multiplex {
+    min-height: 250px;
   }
 </style>
