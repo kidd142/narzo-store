@@ -2,20 +2,23 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import OptimizedImage from '../components/OptimizedImage.astro';
 import { getPosts, getProducts } from '../lib/db';
+import { t, translations } from '../lib/i18n';
 
 const db = Astro.locals?.runtime?.env?.DB;
-const locale = Astro.currentLocale || 'id';
+const locale = (Astro.locals as any).locale || 'id';
+const tr = translations.home;
 
 const featuredArticles = await getPosts(db, { limit: 3, featured: true });
 const featuredProducts = await getProducts(db, 4);
 
 // Helper for localized text
 const getLocalized = (obj: any, key: string) => {
-  return obj[`${key}_${locale}`] || obj[`${key}_id`] || '';
+  if (locale === 'en' && obj[`${key}_en`]) return obj[`${key}_en`];
+  return obj[`${key}_id`] || obj[`${key}`] || '';
 };
 ---
 
-<BaseLayout title="Home" description="Narzo Store - Top Up Games & Voucher Termurah">
+<BaseLayout title={locale === 'en' ? 'Home' : 'Beranda'} description={t(tr.hero_title, locale)}>
   <!-- Hero Section -->
   <section class="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32">
     <!-- Background Elements -->
@@ -30,14 +33,14 @@ const getLocalized = (obj: any, key: string) => {
         Narzo Store
       </h1>
       <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto drop-shadow-md">
-        Platform Top Up Game & Voucher Digital Terpercaya, Cepat, dan Aman.
+        {t(tr.hero_title, locale)}, {t(tr.hero_subtitle, locale)}.
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-4">
         <a href="/products" class="px-8 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-primary/50">
-          Belanja Sekarang
+          {t(tr.shop_now, locale)}
         </a>
         <a href="/about" class="px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg font-semibold transition-all border border-white/10">
-          Tentang Kami
+          {t(tr.about_us, locale)}
         </a>
       </div>
     </div>
@@ -47,10 +50,10 @@ const getLocalized = (obj: any, key: string) => {
   <section class="container mx-auto px-4 py-16">
     <div class="flex justify-between items-end mb-8">
       <div>
-        <h2 class="text-3xl font-bold mb-2">Produk Unggulan</h2>
-        <p class="text-gray-400">Pilihan terbaik untuk gamers</p>
+        <h2 class="text-3xl font-bold mb-2">{t(tr.featured_products, locale)}</h2>
+        <p class="text-gray-400">{t(tr.featured_subtitle, locale)}</p>
       </div>
-      <a href="/products" class="text-primary hover:text-accent transition-colors font-medium">Lihat Semua →</a>
+      <a href="/products" class="text-primary hover:text-accent transition-colors font-medium">{t(tr.view_all, locale)} →</a>
     </div>
     
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -80,10 +83,10 @@ const getLocalized = (obj: any, key: string) => {
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-end mb-8">
         <div>
-          <h2 class="text-3xl font-bold mb-2">Artikel Terbaru</h2>
-          <p class="text-gray-400">Tips, trik, dan berita gaming terkini</p>
+          <h2 class="text-3xl font-bold mb-2">{t(tr.latest_articles, locale)}</h2>
+          <p class="text-gray-400">{t(tr.articles_subtitle, locale)}</p>
         </div>
-        <a href="/blog" class="text-primary hover:text-accent transition-colors font-medium">Lihat Semua →</a>
+        <a href="/blog" class="text-primary hover:text-accent transition-colors font-medium">{t(tr.view_all, locale)} →</a>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -102,7 +105,7 @@ const getLocalized = (obj: any, key: string) => {
               <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
                 {getLocalized(article, 'title')}
               </h3>
-              <p class="text-sm text-gray-500">Baca selengkapnya →</p>
+              <p class="text-sm text-gray-500">{t(translations.blog.read_more, locale)} →</p>
             </div>
           </a>
         ))}
@@ -115,12 +118,12 @@ const getLocalized = (obj: any, key: string) => {
     <div class="relative overflow-hidden bg-gradient-to-br from-primary/20 to-accent/20 rounded-3xl p-12 border border-white/10 shadow-2xl">
       <div class="absolute top-0 left-0 w-full h-full bg-grid-white/[0.05] [mask-image:linear-gradient(to_bottom,white,transparent)]"></div>
       <div class="relative z-10">
-        <h2 class="text-3xl md:text-5xl font-bold mb-6">Siap untuk Top Up?</h2>
+        <h2 class="text-3xl md:text-5xl font-bold mb-6">{t(tr.cta_title, locale)}</h2>
         <p class="text-gray-300 mb-8 max-w-2xl mx-auto text-lg">
-          Bergabunglah dengan ribuan gamers lainnya. Dapatkan harga terbaik dan proses instan hanya di Narzo Store.
+          {t(tr.cta_text, locale)}
         </p>
         <a href="/products" class="inline-block px-10 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-primary/50 transition-all transform hover:scale-105">
-          Mulai Top Up Sekarang
+          {t(tr.cta_button, locale)}
         </a>
       </div>
     </div>

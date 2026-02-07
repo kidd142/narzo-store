@@ -1,9 +1,12 @@
 ---
+import { t, translations } from '../lib/i18n';
+
 const year = new Date().getFullYear();
+const locale = (Astro.locals as any).locale || 'id';
 ---
 
 <footer class="border-t border-surface-100 py-8 mt-auto">
   <div class="container mx-auto px-4 text-center text-gray-500">
-    <p>&copy; {year} Narzo Store. All rights reserved.</p>
+    <p>&copy; {year} Narzo Store. {t(translations.footer.rights, locale)}.</p>
   </div>
 </footer>

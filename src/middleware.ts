@@ -20,8 +20,18 @@ const securityHeaders = {
   ].join('; ')
 };
 
+// Get locale from cookie
+function getLocaleFromCookie(request: Request): string {
+  const cookies = request.headers.get('cookie') || '';
+  const match = cookies.match(/locale=([^;]+)/);
+  return match ? match[1] : 'id';
+}
+
 export const onRequest = defineMiddleware(async ({ request, locals, redirect }, next) => {
   const url = new URL(request.url);
+  
+  // Set locale in locals for all pages to access
+  (locals as any).locale = getLocaleFromCookie(request);
   
   // Only protect /admin routes (except login)
   if (url.pathname.startsWith('/admin') && url.pathname !== '/admin/login') {

@@ -1,10 +1,14 @@
 ---
 import { isEnabled } from '../config/helpers';
+import { t, translations } from '../lib/i18n';
+
+const locale = (Astro.locals as any).locale || 'id';
+const tr = translations.nav;
 
 const nav = [
-  { label: { id: 'Beranda', en: 'Home' }, href: '/' },
-  { label: { id: 'Blog', en: 'Blog' }, href: '/blog' },
-  ...(isEnabled('products') ? [{ label: { id: 'Produk', en: 'Products' }, href: '/products' }] : []),
+  { label: t(tr.home, locale), href: '/' },
+  { label: t(tr.blog, locale), href: '/blog' },
+  ...(isEnabled('products') ? [{ label: t(tr.products, locale), href: '/products' }] : []),
 ];
 
 const currentPath = Astro.url.pathname;
@@ -25,10 +29,8 @@ const currentPath = Astro.url.pathname;
           class={`hover:text-accent transition-colors ${
             currentPath === item.href ? 'text-accent' : ''
           }`}
-          data-label-id={item.label.id}
-          data-label-en={item.label.en}
         >
-          <span class="nav-label">{item.label.id}</span>
+          {item.label}
         </a>
       ))}
       
@@ -37,11 +39,12 @@ const currentPath = Astro.url.pathname;
         id="lang-toggle"
         class="flex items-center gap-1 text-sm border border-surface-100 rounded-lg px-2 py-1 hover:bg-surface-50 transition-colors"
         aria-label="Toggle language"
+        data-locale={locale}
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
         </svg>
-        <span id="current-lang">ID</span>
+        <span>{locale.toUpperCase()}</span>
       </button>
       
       <!-- Search icon -->
@@ -78,10 +81,8 @@ const currentPath = Astro.url.pathname;
           class={`py-2 px-4 rounded-lg hover:bg-surface-50 transition-colors ${
             currentPath === item.href ? 'text-accent bg-surface-50' : ''
           }`}
-          data-label-id={item.label.id}
-          data-label-en={item.label.en}
         >
-          <span class="nav-label">{item.label.id}</span>
+          {item.label}
         </a>
       ))}
       
@@ -89,11 +90,12 @@ const currentPath = Astro.url.pathname;
       <button 
         id="lang-toggle-mobile"
         class="py-2 px-4 rounded-lg hover:bg-surface-50 flex items-center gap-2 text-left"
+        data-locale={locale}
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
         </svg>
-        <span>Language: <span id="current-lang-mobile">ID</span></span>
+        <span>Language: {locale.toUpperCase()}</span>
       </button>
       
       <!-- Mobile Search -->
@@ -102,61 +104,30 @@ const currentPath = Astro.url.pathname;
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
-        Search
+        {t(tr.search, locale)}
       </a>
     </div>
   </div>
 </header>
 
 <script>
-  // Language toggle functionality
-  const LANG_KEY = 'narzo-lang';
-  
-  function getLang() {
-    return localStorage.getItem(LANG_KEY) || 'id';
-  }
-  
-  function setLang(lang: string) {
-    localStorage.setItem(LANG_KEY, lang);
-    updateUI(lang);
-    // Dispatch event for other components
-    window.dispatchEvent(new CustomEvent('langchange', { detail: { lang } }));
-  }
-  
-  function updateUI(lang: string) {
-    // Update toggle buttons
-    const currentLang = document.getElementById('current-lang');
-    const currentLangMobile = document.getElementById('current-lang-mobile');
-    if (currentLang) currentLang.textContent = lang.toUpperCase();
-    if (currentLangMobile) currentLangMobile.textContent = lang.toUpperCase();
+  async function toggleLocale() {
+    const btn = document.getElementById('lang-toggle') || document.getElementById('lang-toggle-mobile');
+    const current = btn?.getAttribute('data-locale') || 'id';
+    const newLocale = current === 'id' ? 'en' : 'id';
     
-    // Update navigation labels
-    document.querySelectorAll('[data-label-id]').forEach(el => {
-      const labelEl = el.querySelector('.nav-label');
-      if (labelEl) {
-        const label = lang === 'en' 
-          ? el.getAttribute('data-label-en') 
-          : el.getAttribute('data-label-id');
-        labelEl.textContent = label;
-      }
+    await fetch('/api/set-locale', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ locale: newLocale })
     });
     
-    // Update html lang attribute
-    document.documentElement.lang = lang;
+    // Reload to apply new locale
+    window.location.reload();
   }
   
-  function toggleLang() {
-    const current = getLang();
-    setLang(current === 'id' ? 'en' : 'id');
-  }
-  
-  // Initialize
-  document.addEventListener('DOMContentLoaded', () => {
-    updateUI(getLang());
-    
-    document.getElementById('lang-toggle')?.addEventListener('click', toggleLang);
-    document.getElementById('lang-toggle-mobile')?.addEventListener('click', toggleLang);
-  });
+  document.getElementById('lang-toggle')?.addEventListener('click', toggleLocale);
+  document.getElementById('lang-toggle-mobile')?.addEventListener('click', toggleLocale);
   
   // Mobile menu toggle
   const menuBtn = document.getElementById('mobile-menu-btn');
