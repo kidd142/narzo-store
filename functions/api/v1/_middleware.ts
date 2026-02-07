@@ -1,4 +1,4 @@
-// functions/api/v1/_middleware.ts
+// API Key Authentication Middleware
 export async function onRequest({ request, env, next }) {
   const apiKey = request.headers.get('X-API-Key');
   
@@ -18,7 +18,10 @@ export async function onRequest({ request, env, next }) {
   const count = parseInt(await env.SESSIONS.get(key) || '0');
   
   if (count > 100) { // 100 requests per minute
-    return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), { status: 429 });
+    return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), { 
+      status: 429,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
   
   await env.SESSIONS.put(key, String(count + 1), { expirationTtl: 60 });
