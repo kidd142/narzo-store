@@ -1,16 +1,20 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { t, translations } from '../lib/i18n';
+
+const locale = (Astro.locals as any).locale || 'id';
+const tr = translations.about;
 ---
 
-<BaseLayout title="About Us" description="Tentang Narzo Store - Platform Top Up Games & Digital Vouchers Terpercaya">
+<BaseLayout title={t(tr.title, locale)} description={t(tr.subtitle, locale)}>
   <div class="container mx-auto px-4 py-16">
     <!-- Hero -->
     <section class="text-center mb-16">
       <h1 class="text-5xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-        Tentang Kami
+        {t(tr.title, locale)}
       </h1>
       <p class="text-xl text-gray-400 max-w-2xl mx-auto">
-        Narzo Store adalah platform top up games dan voucher digital terpercaya di Indonesia.
+        {t(tr.subtitle, locale)}
       </p>
     </section>
 
@@ -18,70 +22,66 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <div class="grid md:grid-cols-2 gap-12 mb-16">
       <div class="card">
         <div class="text-4xl mb-4">🎮</div>
-        <h2 class="text-2xl font-bold mb-4">Misi Kami</h2>
+        <h2 class="text-2xl font-bold mb-4">{t(tr.mission_title, locale)}</h2>
         <p class="text-gray-400">
-          Menyediakan layanan top up game dan voucher digital dengan harga terbaik, 
-          proses cepat, dan keamanan terjamin untuk para gamers di Indonesia.
+          {t(tr.mission_text, locale)}
         </p>
       </div>
       
       <div class="card">
         <div class="text-4xl mb-4">⚡</div>
-        <h2 class="text-2xl font-bold mb-4">Proses Instan</h2>
+        <h2 class="text-2xl font-bold mb-4">{t(tr.instant_title, locale)}</h2>
         <p class="text-gray-400">
-          Dengan sistem otomatis, pesanan Anda akan diproses dalam hitungan detik 
-          setelah pembayaran berhasil dikonfirmasi.
+          {t(tr.instant_text, locale)}
         </p>
       </div>
       
       <div class="card">
         <div class="text-4xl mb-4">🔒</div>
-        <h2 class="text-2xl font-bold mb-4">Aman & Terpercaya</h2>
+        <h2 class="text-2xl font-bold mb-4">{t(tr.secure_title, locale)}</h2>
         <p class="text-gray-400">
-          Semua transaksi dilindungi dengan enkripsi SSL dan kami bekerja sama 
-          dengan payment gateway terpercaya di Indonesia.
+          {t(tr.secure_text, locale)}
         </p>
       </div>
       
       <div class="card">
         <div class="text-4xl mb-4">💬</div>
-        <h2 class="text-2xl font-bold mb-4">Support 24/7</h2>
+        <h2 class="text-2xl font-bold mb-4">{t(tr.support_title, locale)}</h2>
         <p class="text-gray-400">
-          Tim customer service kami siap membantu Anda kapan saja melalui 
-          WhatsApp, email, atau live chat.
+          {t(tr.support_text, locale)}
         </p>
       </div>
     </div>
 
     <!-- Stats -->
     <section class="bg-surface-50 rounded-2xl p-8 md:p-12 text-center">
-      <h2 class="text-2xl font-bold mb-8">Dipercaya oleh Ribuan Gamers</h2>
+      <h2 class="text-2xl font-bold mb-8">{t(tr.stats_title, locale)}</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
         <div>
           <div class="text-4xl font-bold text-accent">10K+</div>
-          <div class="text-gray-400">Pelanggan</div>
+          <div class="text-gray-400">{t(tr.customers, locale)}</div>
         </div>
         <div>
           <div class="text-4xl font-bold text-accent">50K+</div>
-          <div class="text-gray-400">Transaksi</div>
+          <div class="text-gray-400">{t(tr.transactions, locale)}</div>
         </div>
         <div>
           <div class="text-4xl font-bold text-accent">100+</div>
-          <div class="text-gray-400">Produk</div>
+          <div class="text-gray-400">{t(tr.products, locale)}</div>
         </div>
         <div>
           <div class="text-4xl font-bold text-accent">4.9★</div>
-          <div class="text-gray-400">Rating</div>
+          <div class="text-gray-400">{t(tr.rating, locale)}</div>
         </div>
       </div>
     </section>
 
     <!-- CTA -->
     <section class="text-center mt-16">
-      <h2 class="text-2xl font-bold mb-4">Siap untuk Top Up?</h2>
-      <p class="text-gray-400 mb-8">Mulai top up game favorit Anda sekarang!</p>
+      <h2 class="text-2xl font-bold mb-4">{t(tr.cta_title, locale)}</h2>
+      <p class="text-gray-400 mb-8">{t(tr.cta_text, locale)}</p>
       <a href="/products" class="btn-primary inline-block">
-        Lihat Produk
+        {t(tr.view_products, locale)}
       </a>
     </section>
   </div>

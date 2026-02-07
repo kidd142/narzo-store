@@ -26,6 +26,26 @@ export const translations = {
     cta_text: { id: 'Bergabunglah dengan ribuan gamers lainnya. Dapatkan harga terbaik dan proses instan hanya di Narzo Store.', en: 'Join thousands of other gamers. Get the best prices and instant processing only at Narzo Store.' },
     cta_button: { id: 'Mulai Top Up Sekarang', en: 'Start Top Up Now' }
   },
+  about: {
+    title: { id: 'Tentang Kami', en: 'About Us' },
+    subtitle: { id: 'Narzo Store adalah platform top up games dan voucher digital terpercaya di Indonesia.', en: 'Narzo Store is a trusted game top up and digital voucher platform in Indonesia.' },
+    mission_title: { id: 'Misi Kami', en: 'Our Mission' },
+    mission_text: { id: 'Menyediakan layanan top up game dan voucher digital dengan harga terbaik, proses cepat, dan keamanan terjamin untuk para gamers di Indonesia.', en: 'Providing game top up and digital voucher services with the best prices, fast processing, and guaranteed security for gamers in Indonesia.' },
+    instant_title: { id: 'Proses Instan', en: 'Instant Processing' },
+    instant_text: { id: 'Dengan sistem otomatis, pesanan Anda akan diproses dalam hitungan detik setelah pembayaran berhasil dikonfirmasi.', en: 'With our automated system, your order will be processed within seconds after payment is confirmed.' },
+    secure_title: { id: 'Aman & Terpercaya', en: 'Safe & Trusted' },
+    secure_text: { id: 'Semua transaksi dilindungi dengan enkripsi SSL dan kami bekerja sama dengan payment gateway terpercaya di Indonesia.', en: 'All transactions are protected with SSL encryption and we partner with trusted payment gateways in Indonesia.' },
+    support_title: { id: 'Support 24/7', en: '24/7 Support' },
+    support_text: { id: 'Tim customer service kami siap membantu Anda kapan saja melalui WhatsApp, email, atau live chat.', en: 'Our customer service team is ready to help you anytime via WhatsApp, email, or live chat.' },
+    stats_title: { id: 'Dipercaya oleh Ribuan Gamers', en: 'Trusted by Thousands of Gamers' },
+    customers: { id: 'Pelanggan', en: 'Customers' },
+    transactions: { id: 'Transaksi', en: 'Transactions' },
+    products: { id: 'Produk', en: 'Products' },
+    rating: { id: 'Rating', en: 'Rating' },
+    cta_title: { id: 'Siap untuk Top Up?', en: 'Ready to Top Up?' },
+    cta_text: { id: 'Mulai top up game favorit Anda sekarang!', en: 'Start topping up your favorite games now!' },
+    view_products: { id: 'Lihat Produk', en: 'View Products' }
+  },
   blog: {
     title: { id: 'Blog', en: 'Blog' },
     read_more: { id: 'Baca Selengkapnya', en: 'Read More' },
