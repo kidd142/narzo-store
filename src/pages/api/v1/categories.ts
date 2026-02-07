@@ -1,9 +1,35 @@
-// Categories API - Hierarchical categories support
-export async function onRequestGet({ request, env }) {
+import type { APIRoute } from 'astro';
+
+// Auth helper
+function checkAuth(request: Request, env: any): Response | null {
+  const apiKey = request.headers.get('X-API-Key');
+  if (!apiKey || apiKey !== env.API_KEY) {
+    return new Response(JSON.stringify({ 
+      error: 'Unauthorized',
+      message: 'Missing or invalid API key'
+    }), { 
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  return null;
+}
+
+// GET - List categories with hierarchy
+export const GET: APIRoute = async ({ request, locals }) => {
+  const env = (locals as any).runtime?.env;
+  if (!env?.DB) {
+    return new Response(JSON.stringify({ error: 'Database not available' }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
   try {
     const url = new URL(request.url);
     const parentOnly = url.searchParams.get('parents') === 'true';
     const parentId = url.searchParams.get('parent');
+    const flat = url.searchParams.get('flat') === 'true';
     
     let query = 'SELECT * FROM categories';
     let params: any[] = [];
@@ -18,12 +44,10 @@ export async function onRequestGet({ request, env }) {
     query += ' ORDER BY sort_order ASC';
     
     const result = await env.DB.prepare(query).bind(...params).all();
+    let categories = result.results || [];
     
-    // Build hierarchical structure if no filter
-    let categories = result.results;
-    
-    if (!parentOnly && !parentId) {
-      // Group children under parents
+    // Build hierarchical structure if not flat and no filter
+    if (!flat && !parentOnly && !parentId) {
       const parents = categories.filter((c: any) => !c.parent_id);
       const children = categories.filter((c: any) => c.parent_id);
       
@@ -35,12 +59,12 @@ export async function onRequestGet({ request, env }) {
     
     return new Response(JSON.stringify({
       success: true,
-      count: result.results.length,
+      count: result.results?.length || 0,
       categories
     }), {
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch (error) {
+  } catch (error: any) {
     return new Response(JSON.stringify({ 
       error: 'Server error',
       message: error.message 
@@ -49,10 +73,21 @@ export async function onRequestGet({ request, env }) {
       headers: { 'Content-Type': 'application/json' }
     });
   }
-}
+};
 
 // POST - Create/update category
-export async function onRequestPost({ request, env }) {
+export const POST: APIRoute = async ({ request, locals }) => {
+  const env = (locals as any).runtime?.env;
+  if (!env?.DB) {
+    return new Response(JSON.stringify({ error: 'Database not available' }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const authError = checkAuth(request, env);
+  if (authError) return authError;
+
   try {
     const data = await request.json();
     
@@ -93,7 +128,7 @@ export async function onRequestPost({ request, env }) {
     }), {
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch (error) {
+  } catch (error: any) {
     return new Response(JSON.stringify({ 
       error: 'Server error',
       message: error.message 
@@ -102,10 +137,21 @@ export async function onRequestPost({ request, env }) {
       headers: { 'Content-Type': 'application/json' }
     });
   }
-}
+};
 
 // DELETE - Delete category
-export async function onRequestDelete({ request, env }) {
+export const DELETE: APIRoute = async ({ request, locals }) => {
+  const env = (locals as any).runtime?.env;
+  if (!env?.DB) {
+    return new Response(JSON.stringify({ error: 'Database not available' }), { 
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  const authError = checkAuth(request, env);
+  if (authError) return authError;
+
   try {
     const { slug, id } = await request.json();
     
@@ -127,7 +173,7 @@ export async function onRequestDelete({ request, env }) {
     return new Response(JSON.stringify({ success: true }), {
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch (error) {
+  } catch (error: any) {
     return new Response(JSON.stringify({ 
       error: 'Server error',
       message: error.message 
@@ -136,4 +182,4 @@ export async function onRequestDelete({ request, env }) {
       headers: { 'Content-Type': 'application/json' }
     });
   }
-}
+};
