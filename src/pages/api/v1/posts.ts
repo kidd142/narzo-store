@@ -15,6 +15,30 @@ function checkAuth(request: Request, env: any): Response | null {
   return null;
 }
 
+// Sanitize HTML - remove dangerous tags and attributes
+function sanitizeHtml(html: string | null): string | null {
+  if (!html) return null;
+  return html
+    // Remove script tags and content
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    // Remove onclick, onerror, onload etc event handlers
+    .replace(/\s*on\w+\s*=\s*["'][^"']*["']/gi, '')
+    // Remove javascript: URLs
+    .replace(/javascript:/gi, '')
+    // Remove data: URLs in src (potential XSS)
+    .replace(/src\s*=\s*["']data:[^"']*["']/gi, 'src=""')
+    // Remove iframe tags
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    // Remove object/embed tags
+    .replace(/<(object|embed)\b[^<]*(?:(?!<\/\1>)<[^<]*)*<\/\1>/gi, '');
+}
+
+// Sanitize text - strip all HTML
+function sanitizeText(text: string | null): string | null {
+  if (!text) return null;
+  return text.replace(/<[^>]*>/g, '').slice(0, 500);
+}
+
 // GET - List posts
 export const GET: APIRoute = async ({ request, locals }) => {
   const env = locals.runtime.env;
@@ -69,6 +93,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     
     const id = data.id || crypto.randomUUID();
     
+    // Sanitize inputs
+    const safeTitle = sanitizeText(data.title_id);
+    const safeTitleEn = sanitizeText(data.title_en);
+    const safeExcerpt = sanitizeText(data.excerpt_id);
+    const safeExcerptEn = sanitizeText(data.excerpt_en);
+    const safeContent = sanitizeHtml(data.content_id);
+    const safeContentEn = sanitizeHtml(data.content_en);
+    
     await env.DB.prepare(`
       INSERT INTO posts (id, slug, title_id, title_en, excerpt_id, excerpt_en,
                         content_id, content_en, cover_image, category, tags,
@@ -89,9 +121,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
         enable_ads = excluded.enable_ads,
         updated_at = CURRENT_TIMESTAMP
     `).bind(
-      id, data.slug, data.title_id, data.title_en || null,
-      data.excerpt_id || null, data.excerpt_en || null,
-      data.content_id || null, data.content_en || null,
+      id, data.slug, safeTitle, safeTitleEn || null,
+      safeExcerpt || null, safeExcerptEn || null,
+      safeContent || null, safeContentEn || null,
       data.cover_image || null, data.category || null, data.tags || null,
       data.published ? 1 : 0, data.featured ? 1 : 0, data.enable_ads !== false ? 1 : 0
     ).run();
