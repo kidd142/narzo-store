@@ -19,7 +19,7 @@ const getLocalized = (obj: any, key: string) => {
 ---
 
 <BaseLayout 
-  title={locale === 'en' ? 'Narzo Store - Trusted Universal Digital Marketplace' : 'Narzo Store - Marketplace Produk Digital Universal & Terpercaya'} 
+  title={locale === 'en' ? 'Narzo Store - Digital Articles & Universal Marketplace' : 'Narzo Store - Artikel Digital & Marketplace Universal'} 
   description={`${t(tr.hero_title, locale)} - ${t(tr.hero_subtitle, locale)}`}
   ignoreSiteName={true}
 >
@@ -40,76 +40,76 @@ const getLocalized = (obj: any, key: string) => {
         {t(tr.hero_title, locale)}, {t(tr.hero_subtitle, locale)}.
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-4">
-        <a href="/products" class="px-8 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-primary/50">
+        <a href="/blog" class="px-8 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-all shadow-lg hover:shadow-primary/50">
           {t(tr.shop_now, locale)}
         </a>
-        <a href="/about" class="px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg font-semibold transition-all border border-white/10">
+        <a href="/products" class="px-8 py-3 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-lg font-semibold transition-all border border-white/10">
           {t(tr.about_us, locale)}
         </a>
       </div>
     </div>
   </section>
 
-  <!-- Featured Products -->
+  <!-- Featured Articles -->
   <section class="container mx-auto px-4 py-16">
     <div class="flex justify-between items-end mb-8">
       <div>
-        <h2 class="text-3xl font-bold mb-2">{t(tr.featured_products, locale)}</h2>
-        <p class="text-gray-400">{t(tr.featured_subtitle, locale)}</p>
+        <h2 class="text-3xl font-bold mb-2">{t(tr.latest_articles, locale)}</h2>
+        <p class="text-gray-400">{t(tr.articles_subtitle, locale)}</p>
       </div>
-      <a href="/products" class="text-primary hover:text-accent transition-colors font-medium">{t(tr.view_all, locale)} →</a>
+      <a href="/blog" class="text-primary hover:text-accent transition-colors font-medium">{t(tr.view_all, locale)} →</a>
     </div>
     
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      {featuredProducts.map((product) => (
-        <a href={`/products/${product.slug}`} class="group bg-surface-light rounded-xl overflow-hidden hover:transform hover:-translate-y-1 transition-all duration-300 border border-white/5 hover:border-primary/50 shadow-md hover:shadow-xl">
-          <div class="aspect-[4/3] overflow-hidden relative">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {featuredArticles.map((article) => (
+        <a href={`/blog/${article.slug}`} class="group block bg-surface rounded-xl overflow-hidden hover:shadow-lg transition-all border border-white/5">
+          <div class="aspect-video overflow-hidden">
             <OptimizedImage 
-              src={product.image_url || '/images/placeholder-product.jpg'} 
-              alt={getLocalized(product, 'name')}
-              width={400}
-              height={300}
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              src={article.cover_image || '/images/placeholder-article.jpg'} 
+              alt={getLocalized(article, 'title')}
+              width={600}
+              height={338}
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
-          <div class="p-4">
-            <h3 class="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{getLocalized(product, 'name')}</h3>
-            <p class="text-accent font-medium">Rp {product.price.toLocaleString('id-ID')}</p>
+          <div class="p-5">
+            <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
+              {getLocalized(article, 'title')}
+            </h3>
+            <p class="text-sm text-gray-500">{t(translations.blog.read_more, locale)} →</p>
           </div>
         </a>
       ))}
     </div>
   </section>
 
-  <!-- Featured Articles -->
+  <!-- Featured Products -->
   <section class="bg-surface-dark py-16 border-y border-white/5">
     <div class="container mx-auto px-4">
       <div class="flex justify-between items-end mb-8">
         <div>
-          <h2 class="text-3xl font-bold mb-2">{t(tr.latest_articles, locale)}</h2>
-          <p class="text-gray-400">{t(tr.articles_subtitle, locale)}</p>
+          <h2 class="text-3xl font-bold mb-2">{t(tr.featured_products, locale)}</h2>
+          <p class="text-gray-400">{t(tr.featured_subtitle, locale)}</p>
         </div>
-        <a href="/blog" class="text-primary hover:text-accent transition-colors font-medium">{t(tr.view_all, locale)} →</a>
+        <a href="/products" class="text-primary hover:text-accent transition-colors font-medium">{t(tr.view_all, locale)} →</a>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {featuredArticles.map((article) => (
-          <a href={`/blog/${article.slug}`} class="group block bg-surface rounded-xl overflow-hidden hover:shadow-lg transition-all border border-white/5">
-            <div class="aspect-video overflow-hidden">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {featuredProducts.map((product) => (
+          <a href={`/products/${product.slug}`} class="group bg-surface-light rounded-xl overflow-hidden hover:transform hover:-translate-y-1 transition-all duration-300 border border-white/5 hover:border-primary/50 shadow-md hover:shadow-xl">
+            <div class="aspect-[4/3] overflow-hidden relative">
               <OptimizedImage 
-                src={article.cover_image || '/images/placeholder-article.jpg'} 
-                alt={getLocalized(article, 'title')}
-                width={600}
-                height={338}
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                src={product.image_url || '/images/placeholder-product.jpg'} 
+                alt={getLocalized(product, 'name')}
+                width={400}
+                height={300}
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
               />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
-            <div class="p-5">
-              <h3 class="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                {getLocalized(article, 'title')}
-              </h3>
-              <p class="text-sm text-gray-500">{t(translations.blog.read_more, locale)} →</p>
+            <div class="p-4">
+              <h3 class="font-bold text-lg mb-1 group-hover:text-primary transition-colors">{getLocalized(product, 'name')}</h3>
+              <p class="text-accent font-medium">Rp {product.price.toLocaleString('id-ID')}</p>
             </div>
           </a>
         ))}

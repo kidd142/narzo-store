@@ -13,11 +13,11 @@ export const translations = {
     about: { id: 'Tentang', en: 'About' }
   },
   home: {
-    hero_title: { id: 'Marketplace Produk Digital Universal', en: 'Universal Digital Product Marketplace' },
-    hero_subtitle: { id: 'Solusi Digital Terlengkap & Terpercaya', en: 'Complete & Trusted Digital Solution' },
-    shop_now: { id: 'Belanja Sekarang', en: 'Shop Now' },
-    about_us: { id: 'Tentang Kami', en: 'About Us' },
-    featured_products: { id: 'Produk Unggulan', en: 'Featured Products' },
+    hero_title: { id: 'Artikel Digital & Marketplace Terpercaya', en: 'Trusted Digital Articles & Marketplace' },
+    hero_subtitle: { id: 'Baca artikel menarik seputar teknologi, digital lifestyle, dan temukan produk digital terbaik', en: 'Read interesting articles about technology, digital lifestyle, and find the best digital products' },
+    shop_now: { id: 'Baca Artikel', en: 'Read Articles' },
+    about_us: { id: 'Belanja Produk', en: 'Shop Products' },
+    featured_products: { id: 'Produk Pilihan', en: 'Selected Products' },
     featured_subtitle: { id: 'Pilihan terbaik untuk kebutuhan digitalmu', en: 'Best picks for your digital needs' },
     view_all: { id: 'Lihat Semua', en: 'View All' },
     latest_articles: { id: 'Artikel Terbaru', en: 'Latest Articles' },
