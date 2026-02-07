@@ -51,7 +51,20 @@ export const translations = {
     read_more: { id: 'Baca Selengkapnya', en: 'Read More' },
     min_read: { id: 'menit baca', en: 'min read' },
     views: { id: 'dilihat', en: 'views' },
-    no_posts: { id: 'Belum ada artikel', en: 'No articles yet' }
+    no_posts: { id: 'Belum ada artikel', en: 'No articles yet' },
+    related: { id: 'Artikel Terkait', en: 'Related Articles' },
+    share: { id: 'Bagikan artikel ini', en: 'Share this article' }
+  },
+  products: {
+    title: { id: 'Produk', en: 'Products' },
+    no_products: { id: 'Belum ada produk', en: 'No products yet' },
+    buy_now: { id: 'Beli Sekarang', en: 'Buy Now' },
+    add_to_cart: { id: 'Tambah ke Keranjang', en: 'Add to Cart' }
+  },
+  notfound: {
+    title: { id: 'Tidak Ditemukan', en: 'Not Found' },
+    message: { id: 'Halaman tidak ditemukan', en: 'Page not found' },
+    back_home: { id: 'Kembali ke Beranda', en: 'Back to Home' }
   },
   search: {
     title: { id: 'Cari', en: 'Search' },

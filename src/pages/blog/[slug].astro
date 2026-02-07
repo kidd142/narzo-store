@@ -4,7 +4,7 @@ import AdSlot from '../../components/AdSlot.astro';
 import ShareButtons from '../../components/ShareButtons.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
 import { getPostBySlug, getRelatedPosts, incrementViews } from '../../lib/db';
-import { t } from '../../lib/i18n';
+import { t, translations } from '../../lib/i18n';
 
 const { slug } = Astro.params;
 const db = Astro.locals.runtime.env.DB;
@@ -14,7 +14,8 @@ if (!post) return Astro.redirect('/404');
 
 await incrementViews(db, post.id);
 
-const locale = Astro.currentLocale || 'id';
+const locale = (Astro.locals as any).locale || 'id';
+const tr = translations.blog;
 const title = t({ id: post.title_id, en: post.title_en }, locale);
 const content = t({ id: post.content_id, en: post.content_en }, locale);
 
@@ -44,9 +45,9 @@ const enableAds = post.enable_ads === 1;
         <div class="flex flex-wrap gap-4 text-gray-500 mb-6">
           <span class="badge-info">{post.category}</span>
           <span>•</span>
-          <span>{readingTime} min read</span>
+          <span>{readingTime} {t(tr.min_read, locale)}</span>
           <span>•</span>
-          <span>{post.views} views</span>
+          <span>{post.views} {t(tr.views, locale)}</span>
         </div>
         
         <!-- Share buttons -->
@@ -73,7 +74,7 @@ const enableAds = post.enable_ads === 1;
         
         <!-- Share buttons bottom -->
         <div class="mt-8 pt-8 border-t border-surface-100">
-          <p class="text-gray-500 mb-4">Share this article:</p>
+          <p class="text-gray-500 mb-4">{t(tr.share, locale)}:</p>
           <ShareButtons url={pageUrl} title={title} />
         </div>
       </article>
@@ -90,7 +91,7 @@ const enableAds = post.enable_ads === 1;
   <!-- Related Posts -->
   {relatedPosts.length > 0 && (
     <section class="container mx-auto px-4 py-12 border-t border-surface-100">
-      <h2 class="text-2xl font-bold mb-8">Related Articles</h2>
+      <h2 class="text-2xl font-bold mb-8">{t(tr.related, locale)}</h2>
       <RelatedPosts posts={relatedPosts} {locale} />
     </section>
   )}

@@ -2,7 +2,7 @@
 // src/pages/products/[slug].astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getProductBySlug } from '../../lib/db';
-import { t } from '../../lib/i18n';
+import { t, translations } from '../../lib/i18n';
 
 const { slug } = Astro.params;
 const db = Astro.locals?.runtime?.env?.DB || null;
@@ -10,12 +10,17 @@ const product = await getProductBySlug(db, slug!);
 
 if (!product) return Astro.redirect('/404');
 
-const locale = Astro.currentLocale || 'id';
+const locale = (Astro.locals as any).locale || 'id';
+const tr = translations.products;
 const name = t({ id: product.name_id, en: product.name_en }, locale);
 const desc = t({ id: product.description_id, en: product.description_en }, locale);
 
 // Check if payment is configured
 const paymentEnabled = !!Astro.locals?.runtime?.env?.TRIPAY_API_KEY;
+
+const digitalNote = locale === 'en' 
+  ? '🔗 Digital product - link will be sent via email'
+  : '🔗 Produk digital - link akan dikirim via email';
 ---
 
 <BaseLayout title={name}>
@@ -45,7 +50,7 @@ const paymentEnabled = !!Astro.locals?.runtime?.env?.TRIPAY_API_KEY;
         
         {paymentEnabled ? (
           <a href={`/checkout/${product.id}`} class="btn-primary inline-block">
-            Beli Sekarang
+            {t(tr.buy_now, locale)}
           </a>
         ) : (
           <span class="inline-block px-6 py-3 bg-surface-50 rounded-lg text-gray-500">
@@ -55,7 +60,7 @@ const paymentEnabled = !!Astro.locals?.runtime?.env?.TRIPAY_API_KEY;
         
         {product.is_digital && (
           <p class="mt-4 text-sm text-gray-500">
-            🔗 Digital product - link akan dikirim via email
+            {digitalNote}
           </p>
         )}
       </div>

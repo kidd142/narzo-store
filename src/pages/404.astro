@@ -1,11 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { t, translations } from '../lib/i18n';
+
+const locale = (Astro.locals as any).locale || 'id';
+const tr = translations.notfound;
 ---
 
-<BaseLayout title="Not Found">
+<BaseLayout title={t(tr.title, locale)}>
   <div class="container mx-auto px-4 py-24 text-center">
     <h1 class="text-9xl font-bold text-surface-100">404</h1>
-    <p class="text-2xl text-gray-400 mt-4">Page not found</p>
-    <a href="/" class="btn-primary inline-block mt-8">Back to Home</a>
+    <p class="text-2xl text-gray-400 mt-4">{t(tr.message, locale)}</p>
+    <a href="/" class="btn-primary inline-block mt-8">{t(tr.back_home, locale)}</a>
   </div>
 </BaseLayout>
