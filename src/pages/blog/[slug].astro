@@ -4,7 +4,7 @@ import AdSlot from '../../components/AdSlot.astro';
 import ShareButtons from '../../components/ShareButtons.astro';
 import RelatedPosts from '../../components/RelatedPosts.astro';
 import { getPostBySlug, getRelatedPosts, incrementViews } from '../../lib/db';
-import { t, translations } from '../../lib/i18n';
+import { t, translations, getLocalizedArticle } from '../../lib/i18n';
 import { injectAdsAfterH2, splitContentForAds } from '../../lib/content-ads';
 
 const { slug } = Astro.params;
@@ -17,7 +17,7 @@ await incrementViews(db, post.id);
 
 const locale = (Astro.locals as any).locale || 'id';
 const tr = translations.blog;
-const title = t({ id: post.title_id, en: post.title_en }, locale);
+const { title, excerpt } = getLocalizedArticle(post, locale);
 let content = t({ id: post.content_id, en: post.content_en }, locale);
 
 // Calculate reading time (avg 200 words per minute)
@@ -27,20 +27,114 @@ const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 // Get related posts by category
 const relatedPosts = await getRelatedPosts(db, post.category, post.id, 3);
 
-const pageUrl = `${Astro.site}blog/${post.slug}`;
+const pageUrl = `https://narzo.store/blog/${post.slug}`;
 const enableAds = post.enable_ads === 1;
+
+// Dynamic OG image - use article cover or fallback
+const ogImage = post.cover_image || 'https://narzo.store/og-image.svg';
+
+// Article structured data (BlogPosting schema)
+const articleSchema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": title,
+  "description": excerpt || '',
+  "image": ogImage,
+  "datePublished": post.created_at,
+  "dateModified": post.updated_at || post.created_at,
+  "author": {
+    "@type": "Organization",
+    "name": "Narzo Store"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Narzo Store",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://narzo.store/favicon.svg"
+    }
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": pageUrl
+  },
+  "wordCount": wordCount,
+  "articleSection": post.category || "Blog",
+  "keywords": post.tags || ""
+};
+
+// Breadcrumb structured data
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": locale === 'id' ? "Beranda" : "Home",
+      "item": "https://narzo.store"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://narzo.store/blog"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": title,
+      "item": pageUrl
+    }
+  ]
+};
 
 // Inject mid-article ads after 2nd H2 heading (if ads enabled and content is long enough)
 let contentSegments: string[] = [content || ''];
 if (enableAds && wordCount > 300) {
-  // Inject ad after the 2nd H2 (index 1)
   const contentWithAds = injectAdsAfterH2(content || '', [1]);
   contentSegments = splitContentForAds(contentWithAds);
 }
 ---
 
-<BaseLayout title={title} description={post.excerpt_id || ''} showHeaderAd={enableAds}>
+<BaseLayout 
+  title={title} 
+  description={excerpt || ''} 
+  showHeaderAd={enableAds}
+  ogImage={ogImage}
+>
+  <!-- Article Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} slot="head" />
+  <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} slot="head" />
+  
   <div class="container mx-auto px-4 py-12">
+    <!-- Breadcrumbs -->
+    <nav class="mb-6 text-sm" aria-label="Breadcrumb">
+      <ol class="flex items-center gap-2 text-gray-500">
+        <li>
+          <a href="/" class="hover:text-accent transition-colors">
+            {locale === 'id' ? 'Beranda' : 'Home'}
+          </a>
+        </li>
+        <li class="flex items-center gap-2">
+          <span>›</span>
+          <a href="/blog" class="hover:text-accent transition-colors">Blog</a>
+        </li>
+        {post.category && (
+          <li class="flex items-center gap-2">
+            <span>›</span>
+            <a href={`/blog?category=${post.category}`} class="hover:text-accent transition-colors">
+              {post.category}
+            </a>
+          </li>
+        )}
+        <li class="flex items-center gap-2">
+          <span>›</span>
+          <span class="text-gray-400 truncate max-w-[200px]">{title}</span>
+        </li>
+      </ol>
+    </nav>
+
     <div class="grid lg:grid-cols-[1fr_300px] gap-8">
       <!-- Article Content -->
       <article class="max-w-3xl">
@@ -52,11 +146,23 @@ if (enableAds && wordCount > 300) {
         <h1 class="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
         
         <div class="flex flex-wrap gap-4 text-gray-500 mb-6">
-          <span class="badge-info">{post.category}</span>
+          {post.category && (
+            <a href={`/blog?category=${post.category}`} class="badge-info hover:bg-accent/30 transition-colors">
+              {post.category}
+            </a>
+          )}
           <span>•</span>
           <span>{readingTime} {t(tr.min_read, locale)}</span>
           <span>•</span>
           <span>{post.views} {t(tr.views, locale)}</span>
+          <span>•</span>
+          <time datetime={post.created_at}>
+            {new Date(post.created_at).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { 
+              day: 'numeric', 
+              month: 'long', 
+              year: 'numeric' 
+            })}
+          </time>
         </div>
         
         <!-- Share buttons -->

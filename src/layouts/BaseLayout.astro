@@ -9,6 +9,7 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  ogImage?: string;
   showHeaderAd?: boolean;
   showFooterAd?: boolean;
   ignoreSiteName?: boolean;
@@ -18,10 +19,14 @@ const {
   title, 
   description = "Narzo Store - Marketplace Produk Digital Universal & Terpercaya",
   image,
+  ogImage,
   showHeaderAd = true,
   showFooterAd = true,
   ignoreSiteName = false
 } = Astro.props;
+
+// Use ogImage if provided, otherwise fall back to image or default
+const finalOgImage = ogImage || image;
 
 const adsenseId = import.meta.env.ADSENSE_PUBLISHER_ID;
 const adsEnabled = import.meta.env.ADSENSE_ENABLED === 'true';
@@ -30,7 +35,10 @@ const adsEnabled = import.meta.env.ADSENSE_ENABLED === 'true';
 <!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
-  <SEO title={title} description={description} image={image} ignoreSiteName={ignoreSiteName} />
+  <SEO title={title} description={description} image={finalOgImage} ignoreSiteName={ignoreSiteName} />
+  
+  <!-- Extra head content (for schema etc) -->
+  <slot name="head" />
   
   <!-- Preconnect & DNS Prefetch -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
