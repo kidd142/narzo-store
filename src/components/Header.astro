@@ -8,6 +8,14 @@ const nav = [
 ];
 
 const currentPath = Astro.url.pathname;
+const currentLocale = Astro.currentLocale || 'id';
+
+// Build language switch URLs
+function getLocalePath(locale: string) {
+  const path = currentPath.replace(/^\/(en|id)/, '') || '/';
+  if (locale === 'id') return path;
+  return `/${locale}${path === '/' ? '' : path}`;
+}
 ---
 
 <header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-lg border-b border-surface-100">
@@ -29,6 +37,22 @@ const currentPath = Astro.url.pathname;
           {item.label}
         </a>
       ))}
+      
+      <!-- Language Switcher -->
+      <div class="flex items-center gap-1 text-sm border border-surface-100 rounded-lg overflow-hidden">
+        <a 
+          href={getLocalePath('id')}
+          class={`px-2 py-1 transition-colors ${currentLocale === 'id' ? 'bg-accent text-white' : 'hover:bg-surface-50'}`}
+        >
+          ID
+        </a>
+        <a 
+          href={getLocalePath('en')}
+          class={`px-2 py-1 transition-colors ${currentLocale === 'en' ? 'bg-accent text-white' : 'hover:bg-surface-50'}`}
+        >
+          EN
+        </a>
+      </div>
       
       <!-- Search icon -->
       <a href="/search" class="btn-icon" aria-label="Search">
@@ -68,6 +92,23 @@ const currentPath = Astro.url.pathname;
           {item.label}
         </a>
       ))}
+      
+      <!-- Mobile Language Switcher -->
+      <div class="flex items-center gap-2 py-2 px-4">
+        <span class="text-gray-500 text-sm">Language:</span>
+        <a 
+          href={getLocalePath('id')}
+          class={`px-3 py-1 rounded text-sm ${currentLocale === 'id' ? 'bg-accent text-white' : 'bg-surface-50'}`}
+        >
+          ID
+        </a>
+        <a 
+          href={getLocalePath('en')}
+          class={`px-3 py-1 rounded text-sm ${currentLocale === 'en' ? 'bg-accent text-white' : 'bg-surface-50'}`}
+        >
+          EN
+        </a>
+      </div>
       
       <!-- Mobile Search -->
       <a href="/search" class="py-2 px-4 rounded-lg hover:bg-surface-50 flex items-center gap-2">
