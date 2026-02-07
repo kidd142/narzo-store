@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
     const limit = parseInt(url.searchParams.get('limit') || '20');
     
     const posts = await env.DB.prepare(
-      'SELECT id, slug, title_id, title_en, excerpt_id, category, tags, published, featured, views, created_at, updated_at FROM posts ORDER BY created_at DESC LIMIT ?'
+      'SELECT id, slug, title_id, title_en, excerpt_id, published, featured, views, created_at, updated_at FROM posts ORDER BY created_at DESC LIMIT ?'
     ).bind(limit).all();
     
     return new Response(JSON.stringify({
