@@ -1,18 +1,88 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
-import { getPosts } from '../../lib/db';
+import { getPosts, getCategories } from '../../lib/db';
 import { t, translations } from '../../lib/i18n';
 
 const db = Astro.locals.runtime.env.DB;
-const posts = await getPosts(db, { limit: 12 });
+const categories = await getCategories(db);
 const locale = (Astro.locals as any).locale || 'id';
 const tr = translations.blog;
+
+// Get category from URL params
+const url = new URL(Astro.request.url);
+const activeCategory = url.searchParams.get('category');
+
+// Get posts (filtered by category if specified)
+const posts = await getPosts(db, { 
+  limit: 12,
+  category: activeCategory || undefined
+});
+
+// Find active parent category for showing children
+const activeParent = categories.find(cat => 
+  cat.slug === activeCategory || 
+  (cat.children && cat.children.some(child => child.slug === activeCategory))
+);
 ---
 
 <BaseLayout title={t(tr.title, locale)}>
   <div class="container mx-auto px-4 py-12">
     <h1 class="text-4xl font-bold mb-8">{t(tr.title, locale)}</h1>
+    
+    <!-- Category Filter -->
+    <div class="mb-8">
+      <div class="flex flex-wrap gap-2">
+        <a 
+          href="/blog" 
+          class:list={[
+            "px-4 py-2 rounded-full text-sm font-medium transition-colors",
+            !activeCategory 
+              ? "bg-accent text-white" 
+              : "bg-surface-100 text-gray-300 hover:bg-surface-50"
+          ]}
+        >
+          {locale === 'id' ? 'Semua' : 'All'}
+        </a>
+        {categories.map(cat => (
+          <a 
+            href={`/blog?category=${cat.slug}`}
+            class:list={[
+              "px-4 py-2 rounded-full text-sm font-medium transition-colors inline-flex items-center gap-1",
+              activeCategory === cat.slug 
+                ? "bg-accent text-white" 
+                : "bg-surface-100 text-gray-300 hover:bg-surface-50"
+            ]}
+          >
+            <span>{cat.icon}</span>
+            <span>{locale === 'id' ? cat.name_id : (cat.name_en || cat.name_id)}</span>
+            {cat.children && cat.children.length > 0 && (
+              <span class="text-xs opacity-60">+{cat.children.length}</span>
+            )}
+          </a>
+        ))}
+      </div>
+      
+      <!-- Child categories (if parent selected) -->
+      {activeParent && activeParent.children && activeParent.children.length > 0 && (
+        <div class="mt-3 pl-4 flex flex-wrap gap-2">
+          {activeParent.children.map(child => (
+            <a 
+              href={`/blog?category=${child.slug}`}
+              class:list={[
+                "px-3 py-1 rounded-full text-xs font-medium transition-colors inline-flex items-center gap-1",
+                activeCategory === child.slug
+                  ? "bg-accent/20 text-accent"
+                  : "bg-surface-50 text-gray-400 hover:text-accent"
+              ]}
+            >
+              <span>{child.icon}</span>
+              <span>{locale === 'id' ? child.name_id : (child.name_en || child.name_id)}</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
     
     <div class="grid md:grid-cols-3 gap-6">
       {posts.map(post => (

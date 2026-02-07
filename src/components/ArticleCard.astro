@@ -13,8 +13,27 @@ const { title, excerpt } = getLocalizedArticle(post, locale);
 
 <article class="card group">
   {post.cover_image && (
-    <img src={post.cover_image} alt={title}
-         class="w-full h-48 object-cover rounded-lg mb-4" />
+    <div class="relative">
+      <img src={post.cover_image} alt={title}
+           class="w-full h-48 object-cover rounded-lg mb-4" />
+      {post.category && (
+        <a 
+          href={`/blog?category=${post.category}`}
+          class="absolute top-2 left-2 px-2 py-1 text-xs font-medium bg-accent/90 text-white rounded-md hover:bg-accent transition-colors"
+        >
+          {post.category}
+        </a>
+      )}
+    </div>
+  )}
+  
+  {!post.cover_image && post.category && (
+    <a 
+      href={`/blog?category=${post.category}`}
+      class="inline-block mb-2 px-2 py-1 text-xs font-medium bg-accent/20 text-accent rounded-md hover:bg-accent/30 transition-colors"
+    >
+      {post.category}
+    </a>
   )}
   
   <h3 class="text-xl font-semibold mb-2 group-hover:text-accent transition-colors">
@@ -24,7 +43,7 @@ const { title, excerpt } = getLocalizedArticle(post, locale);
   {excerpt && <p class="text-gray-400 line-clamp-2">{excerpt}</p>}
   
   <div class="mt-4 flex justify-between text-sm text-gray-500">
-    <span>{post.category}</span>
+    <span>{new Date(post.created_at).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
     <span>{post.views} views</span>
   </div>
 </article>
