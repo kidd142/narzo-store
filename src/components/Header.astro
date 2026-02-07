@@ -2,20 +2,12 @@
 import { isEnabled } from '../config/helpers';
 
 const nav = [
-  { label: 'Home', href: '/' },
-  { label: 'Blog', href: '/blog' },
-  ...(isEnabled('products') ? [{ label: 'Products', href: '/products' }] : []),
+  { label: { id: 'Beranda', en: 'Home' }, href: '/' },
+  { label: { id: 'Blog', en: 'Blog' }, href: '/blog' },
+  ...(isEnabled('products') ? [{ label: { id: 'Produk', en: 'Products' }, href: '/products' }] : []),
 ];
 
 const currentPath = Astro.url.pathname;
-const currentLocale = Astro.currentLocale || 'id';
-
-// Build language switch URLs
-function getLocalePath(locale: string) {
-  const path = currentPath.replace(/^\/(en|id)/, '') || '/';
-  if (locale === 'id') return path;
-  return `/${locale}${path === '/' ? '' : path}`;
-}
 ---
 
 <header class="sticky top-0 z-50 bg-surface/80 backdrop-blur-lg border-b border-surface-100">
@@ -33,26 +25,24 @@ function getLocalePath(locale: string) {
           class={`hover:text-accent transition-colors ${
             currentPath === item.href ? 'text-accent' : ''
           }`}
+          data-label-id={item.label.id}
+          data-label-en={item.label.en}
         >
-          {item.label}
+          <span class="nav-label">{item.label.id}</span>
         </a>
       ))}
       
       <!-- Language Switcher -->
-      <div class="flex items-center gap-1 text-sm border border-surface-100 rounded-lg overflow-hidden">
-        <a 
-          href={getLocalePath('id')}
-          class={`px-2 py-1 transition-colors ${currentLocale === 'id' ? 'bg-accent text-white' : 'hover:bg-surface-50'}`}
-        >
-          ID
-        </a>
-        <a 
-          href={getLocalePath('en')}
-          class={`px-2 py-1 transition-colors ${currentLocale === 'en' ? 'bg-accent text-white' : 'hover:bg-surface-50'}`}
-        >
-          EN
-        </a>
-      </div>
+      <button 
+        id="lang-toggle"
+        class="flex items-center gap-1 text-sm border border-surface-100 rounded-lg px-2 py-1 hover:bg-surface-50 transition-colors"
+        aria-label="Toggle language"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+        </svg>
+        <span id="current-lang">ID</span>
+      </button>
       
       <!-- Search icon -->
       <a href="/search" class="btn-icon" aria-label="Search">
@@ -88,27 +78,23 @@ function getLocalePath(locale: string) {
           class={`py-2 px-4 rounded-lg hover:bg-surface-50 transition-colors ${
             currentPath === item.href ? 'text-accent bg-surface-50' : ''
           }`}
+          data-label-id={item.label.id}
+          data-label-en={item.label.en}
         >
-          {item.label}
+          <span class="nav-label">{item.label.id}</span>
         </a>
       ))}
       
-      <!-- Mobile Language Switcher -->
-      <div class="flex items-center gap-2 py-2 px-4">
-        <span class="text-gray-500 text-sm">Language:</span>
-        <a 
-          href={getLocalePath('id')}
-          class={`px-3 py-1 rounded text-sm ${currentLocale === 'id' ? 'bg-accent text-white' : 'bg-surface-50'}`}
-        >
-          ID
-        </a>
-        <a 
-          href={getLocalePath('en')}
-          class={`px-3 py-1 rounded text-sm ${currentLocale === 'en' ? 'bg-accent text-white' : 'bg-surface-50'}`}
-        >
-          EN
-        </a>
-      </div>
+      <!-- Mobile Language Toggle -->
+      <button 
+        id="lang-toggle-mobile"
+        class="py-2 px-4 rounded-lg hover:bg-surface-50 flex items-center gap-2 text-left"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+        </svg>
+        <span>Language: <span id="current-lang-mobile">ID</span></span>
+      </button>
       
       <!-- Mobile Search -->
       <a href="/search" class="py-2 px-4 rounded-lg hover:bg-surface-50 flex items-center gap-2">
@@ -123,6 +109,56 @@ function getLocalePath(locale: string) {
 </header>
 
 <script>
+  // Language toggle functionality
+  const LANG_KEY = 'narzo-lang';
+  
+  function getLang() {
+    return localStorage.getItem(LANG_KEY) || 'id';
+  }
+  
+  function setLang(lang: string) {
+    localStorage.setItem(LANG_KEY, lang);
+    updateUI(lang);
+    // Dispatch event for other components
+    window.dispatchEvent(new CustomEvent('langchange', { detail: { lang } }));
+  }
+  
+  function updateUI(lang: string) {
+    // Update toggle buttons
+    const currentLang = document.getElementById('current-lang');
+    const currentLangMobile = document.getElementById('current-lang-mobile');
+    if (currentLang) currentLang.textContent = lang.toUpperCase();
+    if (currentLangMobile) currentLangMobile.textContent = lang.toUpperCase();
+    
+    // Update navigation labels
+    document.querySelectorAll('[data-label-id]').forEach(el => {
+      const labelEl = el.querySelector('.nav-label');
+      if (labelEl) {
+        const label = lang === 'en' 
+          ? el.getAttribute('data-label-en') 
+          : el.getAttribute('data-label-id');
+        labelEl.textContent = label;
+      }
+    });
+    
+    // Update html lang attribute
+    document.documentElement.lang = lang;
+  }
+  
+  function toggleLang() {
+    const current = getLang();
+    setLang(current === 'id' ? 'en' : 'id');
+  }
+  
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    updateUI(getLang());
+    
+    document.getElementById('lang-toggle')?.addEventListener('click', toggleLang);
+    document.getElementById('lang-toggle-mobile')?.addEventListener('click', toggleLang);
+  });
+  
+  // Mobile menu toggle
   const menuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
   const menuIcon = menuBtn?.querySelector('.menu-icon');
