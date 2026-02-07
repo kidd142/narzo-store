@@ -68,7 +68,7 @@ export async function onRequestGet({ request, env }) {
     const limit = parseInt(url.searchParams.get('limit') || '20');
     const published = url.searchParams.get('published');
     
-    let query = 'SELECT id, slug, title_id, title_en, excerpt_id, category, tags, published, featured, views, created_at, updated_at FROM posts';
+    let query = 'SELECT id, slug, title_id, title_en, excerpt_id, excerpt_en, category, tags, published, featured, views, created_at, updated_at FROM posts';
     
     if (published !== null) {
       query += ` WHERE published = ${published === 'true' ? 1 : 0}`;
