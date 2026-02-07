@@ -13,24 +13,24 @@ export const translations = {
     about: { id: 'Tentang', en: 'About' }
   },
   home: {
-    hero_title: { id: 'Platform Top Up Game & Voucher Digital', en: 'Game Top Up & Digital Voucher Platform' },
-    hero_subtitle: { id: 'Terpercaya, Cepat, dan Aman', en: 'Trusted, Fast, and Secure' },
+    hero_title: { id: 'Marketplace Produk Digital Universal', en: 'Universal Digital Product Marketplace' },
+    hero_subtitle: { id: 'Solusi Digital Terlengkap & Terpercaya', en: 'Complete & Trusted Digital Solution' },
     shop_now: { id: 'Belanja Sekarang', en: 'Shop Now' },
     about_us: { id: 'Tentang Kami', en: 'About Us' },
     featured_products: { id: 'Produk Unggulan', en: 'Featured Products' },
-    featured_subtitle: { id: 'Pilihan terbaik untuk gamers', en: 'Best picks for gamers' },
+    featured_subtitle: { id: 'Pilihan terbaik untuk kebutuhan digitalmu', en: 'Best picks for your digital needs' },
     view_all: { id: 'Lihat Semua', en: 'View All' },
     latest_articles: { id: 'Artikel Terbaru', en: 'Latest Articles' },
-    articles_subtitle: { id: 'Tips, trik, dan berita gaming terkini', en: 'Latest gaming tips, tricks, and news' },
-    cta_title: { id: 'Siap untuk Top Up?', en: 'Ready to Top Up?' },
-    cta_text: { id: 'Bergabunglah dengan ribuan gamers lainnya. Dapatkan harga terbaik dan proses instan hanya di Narzo Store.', en: 'Join thousands of other gamers. Get the best prices and instant processing only at Narzo Store.' },
-    cta_button: { id: 'Mulai Top Up Sekarang', en: 'Start Top Up Now' }
+    articles_subtitle: { id: 'Tips, trik, dan berita digital terkini', en: 'Latest digital tips, tricks, and news' },
+    cta_title: { id: 'Siap Berbelanja?', en: 'Ready to Shop?' },
+    cta_text: { id: 'Bergabunglah dengan ribuan pelanggan lainnya. Dapatkan harga terbaik dan proses instan hanya di Narzo Store.', en: 'Join thousands of other customers. Get the best prices and instant processing only at Narzo Store.' },
+    cta_button: { id: 'Mulai Belanja Sekarang', en: 'Start Shopping Now' }
   },
   about: {
     title: { id: 'Tentang Kami', en: 'About Us' },
-    subtitle: { id: 'Narzo Store adalah platform top up games dan voucher digital terpercaya di Indonesia.', en: 'Narzo Store is a trusted game top up and digital voucher platform in Indonesia.' },
+    subtitle: { id: 'Narzo Store adalah marketplace digital universal terpercaya di Indonesia.', en: 'Narzo Store is a trusted universal digital marketplace in Indonesia.' },
     mission_title: { id: 'Misi Kami', en: 'Our Mission' },
-    mission_text: { id: 'Menyediakan layanan top up game dan voucher digital dengan harga terbaik, proses cepat, dan keamanan terjamin untuk para gamers di Indonesia.', en: 'Providing game top up and digital voucher services with the best prices, fast processing, and guaranteed security for gamers in Indonesia.' },
+    mission_text: { id: 'Menyediakan layanan produk digital dengan harga terbaik, proses cepat, dan keamanan terjamin untuk semua.', en: 'Providing digital product services with the best prices, fast processing, and guaranteed security for everyone.' },
     instant_title: { id: 'Proses Instan', en: 'Instant Processing' },
     instant_text: { id: 'Dengan sistem otomatis, pesanan Anda akan diproses dalam hitungan detik setelah pembayaran berhasil dikonfirmasi.', en: 'With our automated system, your order will be processed within seconds after payment is confirmed.' },
     secure_title: { id: 'Aman & Terpercaya', en: 'Safe & Trusted' },

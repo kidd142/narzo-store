@@ -11,14 +11,16 @@ interface Props {
   image?: string;
   showHeaderAd?: boolean;
   showFooterAd?: boolean;
+  ignoreSiteName?: boolean;
 }
 
 const { 
   title, 
-  description = "Narzo Store - Top Up Games & Digital Vouchers Terpercaya",
+  description = "Narzo Store - Marketplace Produk Digital Universal & Terpercaya",
   image,
   showHeaderAd = true,
-  showFooterAd = true
+  showFooterAd = true,
+  ignoreSiteName = false
 } = Astro.props;
 
 const adsenseId = import.meta.env.ADSENSE_PUBLISHER_ID;
@@ -28,7 +30,7 @@ const adsEnabled = import.meta.env.ADSENSE_ENABLED === 'true';
 <!DOCTYPE html>
 <html lang="id" class="dark">
 <head>
-  <SEO title={title} description={description} image={image} />
+  <SEO title={title} description={description} image={image} ignoreSiteName={ignoreSiteName} />
   
   <!-- Preconnect & DNS Prefetch -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

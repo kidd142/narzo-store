@@ -18,7 +18,11 @@ const getLocalized = (obj: any, key: string) => {
 };
 ---
 
-<BaseLayout title={locale === 'en' ? 'Home' : 'Beranda'} description={t(tr.hero_title, locale)}>
+<BaseLayout 
+  title={locale === 'en' ? 'Narzo Store - Trusted Universal Digital Marketplace' : 'Narzo Store - Marketplace Produk Digital Universal & Terpercaya'} 
+  description={`${t(tr.hero_title, locale)} - ${t(tr.hero_subtitle, locale)}`}
+  ignoreSiteName={true}
+>
   <!-- Hero Section -->
   <section class="relative overflow-hidden pt-12 pb-24 md:pt-20 md:pb-32">
     <!-- Background Elements -->

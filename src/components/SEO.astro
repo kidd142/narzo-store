@@ -6,21 +6,27 @@ export interface Props {
   article?: boolean;
   publishedTime?: string;
   author?: string;
+  ignoreSiteName?: boolean;
 }
 
 const {
   title,
-  description = "Narzo Store - Top Up Games & Digital Vouchers Terpercaya",
+  description = "Narzo Store - Marketplace Produk Digital Universal & Terpercaya",
   image = "/og-image.svg",
   article = false,
   publishedTime,
   author = "Narzo Store",
+  ignoreSiteName = false,
 } = Astro.props;
 
 const siteName = "Narzo Store";
 const siteUrl = "https://narzo.store";
 const canonicalURL = new URL(Astro.url.pathname, siteUrl);
 const socialImageURL = new URL(image, siteUrl);
+
+// Construct the full title based on ignoreSiteName prop
+const fullTitle = ignoreSiteName ? title : `${title} | ${siteName}`;
+
 
 // JSON-LD structured data
 const websiteSchema = {
@@ -56,8 +62,8 @@ const organizationSchema = {
 <link rel="canonical" href={canonicalURL} />
 
 <!-- Primary Meta Tags -->
-<title>{title} | {siteName}</title>
-<meta name="title" content={`${title} | ${siteName}`} />
+<title>{fullTitle}</title>
+<meta name="title" content={fullTitle} />
 <meta name="description" content={description} />
 
 <!-- Open Graph / Facebook -->
