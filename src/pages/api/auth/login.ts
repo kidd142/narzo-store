@@ -1,10 +1,13 @@
-// functions/api/auth/login.ts
-export async function onRequestPost({ request, env }) {
+// src/pages/api/auth/login.ts
+import type { APIRoute } from 'astro';
+
+export const POST: APIRoute = async ({ request, locals, redirect }) => {
+  const env = locals.runtime.env;
   const formData = await request.formData();
   const password = formData.get('password');
   
   if (password !== env.ADMIN_PASSWORD) {
-    return Response.redirect(new URL('/admin/login?error=1', request.url));
+    return redirect('/admin/login?error=1');
   }
   
   // Create session
@@ -20,4 +23,4 @@ export async function onRequestPost({ request, env }) {
       'Set-Cookie': `session=${sessionId}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=86400`
     }
   });
-}
+};
