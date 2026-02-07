@@ -34,7 +34,7 @@ const getLocalized = (obj: any, key: string) => {
     
     <div class="container mx-auto px-4 relative z-10 text-center">
       <h1 class="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent drop-shadow-lg">
-        Narzo Store
+        {locale === 'en' ? 'Digital Articles & Marketplace' : 'Artikel Digital & Marketplace'}
       </h1>
       <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto drop-shadow-md">
         {t(tr.hero_title, locale)}, {t(tr.hero_subtitle, locale)}.
