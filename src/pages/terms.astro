@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const locale = (Astro.locals as any).locale || 'id';
+
+const content = {
+  id: {
+    title: "Syarat dan Ketentuan",
+    lastUpdated: "Terakhir Diperbarui: 8 Februari 2026",
+    sections: [
+      {
+        title: "1. Pendahuluan",
+        text: "Selamat datang di Narzo Store. Dengan mengakses dan menggunakan website kami, Anda setuju untuk terikat oleh Syarat dan Ketentuan ini. Jika Anda tidak setuju, mohon untuk tidak menggunakan layanan kami."
+      },
+      {
+        title: "2. Akun Pengguna",
+        text: "Anda bertanggung jawab untuk menjaga kerahasiaan akun dan kata sandi Anda. Anda setuju untuk menerima tanggung jawab atas semua aktivitas yang terjadi di bawah akun Anda."
+      },
+      {
+        title: "3. Produk dan Layanan",
+        text: "Kami menyediakan produk digital seperti voucher game, pulsa, dan layanan top-up. Semua deskripsi produk dan harga dapat berubah sewaktu-waktu tanpa pemberitahuan sebelumnya."
+      },
+      {
+        title: "4. Pembayaran",
+        text: "Pembayaran diproses melalui gateway pembayaran pihak ketiga (Tripay). Kami tidak menyimpan informasi kartu kredit Anda. Semua transaksi bersifat final setelah pembayaran dikonfirmasi."
+      },
+      {
+        title: "5. Pengembalian Dana (Refund)",
+        text: "Produk digital yang telah dikirimkan tidak dapat dikembalikan atau ditukar, kecuali terdapat kesalahan teknis dari pihak kami yang menyebabkan produk tidak dapat digunakan."
+      },
+      {
+        title: "6. Batasan Tanggung Jawab",
+        text: "Narzo Store tidak bertanggung jawab atas kerugian langsung, tidak langsung, insidental, atau konsekuensial yang timbul dari penggunaan atau ketidakmampuan menggunakan layanan kami."
+      },
+      {
+        title: "7. Perubahan Syarat",
+        text: "Kami berhak untuk mengubah Syarat dan Ketentuan ini kapan saja. Perubahan akan berlaku segera setelah diposting di website ini. Penggunaan berkelanjutan Anda atas layanan kami setelah perubahan tersebut merupakan persetujuan Anda terhadap perubahan tersebut."
+      },
+      {
+        title: "8. Kontak",
+        text: "Jika Anda memiliki pertanyaan tentang Syarat dan Ketentuan ini, silakan hubungi kami melalui halaman Kontak."
+      }
+    ]
+  },
+  en: {
+    title: "Terms of Service",
+    lastUpdated: "Last Updated: February 8, 2026",
+    sections: [
+      {
+        title: "1. Introduction",
+        text: "Welcome to Narzo Store. By accessing and using our website, you agree to be bound by these Terms of Service. If you do not agree, please do not use our services."
+      },
+      {
+        title: "2. User Accounts",
+        text: "You are responsible for maintaining the confidentiality of your account and password. You agree to accept responsibility for all activities that occur under your account."
+      },
+      {
+        title: "3. Products and Services",
+        text: "We provide digital products such as game vouchers, phone credits, and top-up services. All product descriptions and prices are subject to change at any time without prior notice."
+      },
+      {
+        title: "4. Payment",
+        text: "Payments are processed through a third-party payment gateway (Tripay). We do not store your credit card information. All transactions are final once payment is confirmed."
+      },
+      {
+        title: "5. Refund Policy",
+        text: "Digital products that have been delivered cannot be returned or exchanged, unless there is a technical error on our part that causes the product to be unusable."
+      },
+      {
+        title: "6. Limitation of Liability",
+        text: "Narzo Store shall not be liable for any direct, indirect, incidental, or consequential damages arising from the use or inability to use our services."
+      },
+      {
+        title: "7. Changes to Terms",
+        text: "We reserve the right to modify these Terms of Service at any time. Changes will be effective immediately upon posting on this website. Your continued use of our services after such changes constitutes your acceptance of the changes."
+      },
+      {
+        title: "8. Contact",
+        text: "If you have any questions about these Terms of Service, please contact us via our Contact page."
+      }
+    ]
+  }
+};
+
+const currentContent = content[locale === 'en' ? 'en' : 'id'];
+---
+
+<BaseLayout title={currentContent.title}>
+  <div class="container mx-auto px-4 py-12 max-w-4xl">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-center text-accent">{currentContent.title}</h1>
+    <p class="text-gray-400 text-center mb-12">{currentContent.lastUpdated}</p>
+    
+    <div class="space-y-8 bg-surface-50 p-6 md:p-10 rounded-2xl border border-surface-200/50 shadow-sm">
+      {currentContent.sections.map((section) => (
+        <section>
+          <h2 class="text-xl font-semibold mb-3 text-gray-100">{section.title}</h2>
+          <p class="text-gray-300 leading-relaxed">{section.text}</p>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

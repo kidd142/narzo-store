@@ -1,0 +1,102 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const locale = (Astro.locals as any).locale || 'id';
+
+const content = {
+  id: {
+    title: "Kebijakan Privasi",
+    lastUpdated: "Terakhir Diperbarui: 8 Februari 2026",
+    sections: [
+      {
+        title: "1. Pendahuluan",
+        text: "Selamat datang di Narzo Store. Kami menghargai privasi Anda dan berkomitmen untuk melindungi data pribadi Anda. Kebijakan Privasi ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi Anda ketika Anda mengunjungi website kami atau menggunakan layanan kami."
+      },
+      {
+        title: "2. Informasi yang Kami Kumpulkan",
+        text: "Kami dapat mengumpulkan informasi pribadi seperti nama, alamat email, nomor telepon, dan detail pembayaran ketika Anda melakukan pembelian atau mendaftar akun. Kami juga mengumpulkan data teknis seperti alamat IP, jenis browser, dan data penggunaan melalui cookies."
+      },
+      {
+        title: "3. Penggunaan Informasi",
+        text: "Informasi yang kami kumpulkan digunakan untuk memproses pesanan Anda, mengelola akun pengguna, meningkatkan layanan kami, dan mengirimkan informasi terkait produk atau promo (jika Anda berlangganan newsletter)."
+      },
+      {
+        title: "4. Cookies",
+        text: "Website kami menggunakan cookies untuk meningkatkan pengalaman pengguna, mengingat preferensi Anda, dan melacak statistik pengunjung. Anda dapat mengatur browser Anda untuk menolak cookies, namun beberapa fitur website mungkin tidak berfungsi dengan baik."
+      },
+      {
+        title: "5. Layanan Pihak Ketiga",
+        text: "Kami bekerja sama dengan pihak ketiga terpercaya, seperti penyedia layanan pembayaran (Tripay) dan layanan analitik (Google Analytics), yang mungkin memiliki akses terbatas ke data Anda untuk tujuan operasional tertentu."
+      },
+      {
+        title: "6. Keamanan Data",
+        text: "Kami menerapkan langkah-langkah keamanan teknis dan organisasi yang sesuai untuk melindungi data pribadi Anda dari akses, pengungkapan, perubahan, atau pemusnahan yang tidak sah."
+      },
+      {
+        title: "7. Hak Anda",
+        text: "Anda memiliki hak untuk mengakses, memperbaiki, atau menghapus data pribadi Anda yang kami simpan. Hubungi kami jika Anda ingin menggunakan hak-hak ini."
+      },
+      {
+        title: "8. Hubungi Kami",
+        text: "Jika Anda memiliki pertanyaan tentang Kebijakan Privasi ini, silakan hubungi kami melalui halaman Kontak."
+      }
+    ]
+  },
+  en: {
+    title: "Privacy Policy",
+    lastUpdated: "Last Updated: February 8, 2026",
+    sections: [
+      {
+        title: "1. Introduction",
+        text: "Welcome to Narzo Store. We value your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and protect your information when you visit our website or use our services."
+      },
+      {
+        title: "2. Information We Collect",
+        text: "We may collect personal information such as your name, email address, phone number, and payment details when you make a purchase or register for an account. We also collect technical data such as IP address, browser type, and usage data via cookies."
+      },
+      {
+        title: "3. How We Use Information",
+        text: "The information we collect is used to process your orders, manage user accounts, improve our services, and send product-related information or promotions (if you subscribe to our newsletter)."
+      },
+      {
+        title: "4. Cookies",
+        text: "Our website uses cookies to enhance user experience, remember your preferences, and track visitor statistics. You can set your browser to refuse cookies, but some website features may not function properly."
+      },
+      {
+        title: "5. Third-Party Services",
+        text: "We work with trusted third parties, such as payment service providers (Tripay) and analytics services (Google Analytics), who may have limited access to your data for specific operational purposes."
+      },
+      {
+        title: "6. Data Security",
+        text: "We implement appropriate technical and organizational security measures to protect your personal data from unauthorized access, disclosure, alteration, or destruction."
+      },
+      {
+        title: "7. Your Rights",
+        text: "You have the right to access, correct, or delete your personal data that we hold. Please contact us if you wish to exercise these rights."
+      },
+      {
+        title: "8. Contact Us",
+        text: "If you have any questions about this Privacy Policy, please contact us via our Contact page."
+      }
+    ]
+  }
+};
+
+const currentContent = content[locale === 'en' ? 'en' : 'id'];
+---
+
+<BaseLayout title={currentContent.title}>
+  <div class="container mx-auto px-4 py-12 max-w-4xl">
+    <h1 class="text-3xl md:text-4xl font-bold mb-4 text-center text-accent">{currentContent.title}</h1>
+    <p class="text-gray-400 text-center mb-12">{currentContent.lastUpdated}</p>
+    
+    <div class="space-y-8 bg-surface-50 p-6 md:p-10 rounded-2xl border border-surface-200/50 shadow-sm">
+      {currentContent.sections.map((section) => (
+        <section>
+          <h2 class="text-xl font-semibold mb-3 text-gray-100">{section.title}</h2>
+          <p class="text-gray-300 leading-relaxed">{section.text}</p>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>

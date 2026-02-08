@@ -108,6 +108,9 @@ export const translations = {
     results: { id: 'hasil', en: 'results' }
   },
   footer: {
-    rights: { id: 'Hak cipta dilindungi', en: 'All rights reserved' }
+    rights: { id: 'Hak cipta dilindungi', en: 'All rights reserved' },
+    privacy: { id: 'Kebijakan Privasi', en: 'Privacy Policy' },
+    terms: { id: 'Syarat & Ketentuan', en: 'Terms of Service' },
+    contact: { id: 'Kontak', en: 'Contact' }
   }
 };
