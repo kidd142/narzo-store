@@ -6,6 +6,7 @@ interface Props {
   height?: number;
   class?: string;
   fit?: 'scale-down' | 'contain' | 'cover' | 'crop' | 'pad';
+  priority?: boolean;
 }
 
 const {
@@ -14,7 +15,8 @@ const {
   width,
   height,
   class: className,
-  fit = 'cover'
+  fit = 'cover',
+  priority = false
 } = Astro.props;
 
 // Helper to construct Cloudflare Image Resizing URL
@@ -50,6 +52,7 @@ const optimizedSrc = getOptimizedUrl(src, width, height, fit);
   width={width} 
   height={height} 
   class={className} 
-  loading="lazy" 
-  decoding="async" 
+  loading={priority ? "eager" : "lazy"} 
+  decoding="async"
+  fetchpriority={priority ? "high" : undefined}
 />

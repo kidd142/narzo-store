@@ -15,7 +15,9 @@ const { title, excerpt } = getLocalizedArticle(post, locale);
   {post.cover_image && (
     <div class="relative">
       <img src={post.cover_image} alt={title}
-           class="w-full h-48 object-cover rounded-lg mb-4" />
+           class="w-full h-48 object-cover rounded-lg mb-4"
+           loading="lazy"
+           decoding="async" />
       {post.category && (
         <a 
           href={`/blog?category=${post.category}`}
