@@ -1,4 +1,4 @@
-// functions/api/admin/_middleware.ts
+﻿// functions/api/admin/_middleware.ts
 export async function onRequest({ request, env, next }) {
   // Get session cookie
   const cookie = request.headers.get('Cookie') || '';

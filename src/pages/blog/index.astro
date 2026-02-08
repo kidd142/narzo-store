@@ -126,44 +126,74 @@ function getPaginationUrl(page: number) {
         {currentPage > 1 ? (
           <a 
             href={getPaginationUrl(currentPage - 1)}
-            class="px-4 py-2 rounded-lg bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors"
+            class="w-10 h-10 md:w-auto md:px-4 md:py-2 flex items-center justify-center rounded-lg bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors"
           >
-            ← {locale === 'id' ? 'Sebelumnya' : 'Previous'}
+            <span class="md:hidden">←</span>
+            <span class="hidden md:inline">← {locale === 'id' ? 'Sebelumnya' : 'Previous'}</span>
           </a>
         ) : (
-          <span class="px-4 py-2 rounded-lg bg-surface-100 text-gray-400 opacity-50 cursor-not-allowed">
-            ← {locale === 'id' ? 'Sebelumnya' : 'Previous'}
+          <span class="w-10 h-10 md:w-auto md:px-4 md:py-2 flex items-center justify-center rounded-lg bg-surface-100 text-gray-400 opacity-50 cursor-not-allowed">
+            <span class="md:hidden">←</span>
+            <span class="hidden md:inline">← {locale === 'id' ? 'Sebelumnya' : 'Previous'}</span>
           </span>
         )}
         
-        <!-- Page Numbers -->
+        <!-- Page Numbers (Desktop: all, Mobile: current only) -->
         <div class="flex items-center gap-1">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            <a
-              href={getPaginationUrl(page)}
-              class:list={[
-                "w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors",
-                page === currentPage
-                  ? "bg-accent text-white"
-                  : "bg-surface-100 text-gray-300 hover:bg-surface-50"
-              ]}
-            >
-              {page}
-            </a>
-          ))}
+          <!-- Mobile: show limited pages -->
+          <div class="flex md:hidden items-center gap-1">
+            {currentPage > 2 && (
+              <>
+                <a href={getPaginationUrl(1)} class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors">1</a>
+                {currentPage > 3 && <span class="text-gray-400">...</span>}
+              </>
+            )}
+            {currentPage > 1 && (
+              <a href={getPaginationUrl(currentPage - 1)} class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors">{currentPage - 1}</a>
+            )}
+            <span class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium bg-accent text-white">{currentPage}</span>
+            {currentPage < totalPages && (
+              <a href={getPaginationUrl(currentPage + 1)} class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors">{currentPage + 1}</a>
+            )}
+            {currentPage < totalPages - 1 && (
+              <>
+                {currentPage < totalPages - 2 && <span class="text-gray-400">...</span>}
+                <a href={getPaginationUrl(totalPages)} class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors">{totalPages}</a>
+              </>
+            )}
+          </div>
+          
+          <!-- Desktop: show all pages -->
+          <div class="hidden md:flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <a
+                href={getPaginationUrl(page)}
+                class:list={[
+                  "w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors",
+                  page === currentPage
+                    ? "bg-accent text-white"
+                    : "bg-surface-100 text-gray-300 hover:bg-surface-50"
+                ]}
+              >
+                {page}
+              </a>
+            ))}
+          </div>
         </div>
         
         <!-- Next -->
         {currentPage < totalPages ? (
           <a 
             href={getPaginationUrl(currentPage + 1)}
-            class="px-4 py-2 rounded-lg bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors"
+            class="w-10 h-10 md:w-auto md:px-4 md:py-2 flex items-center justify-center rounded-lg bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors"
           >
-            {locale === 'id' ? 'Selanjutnya' : 'Next'} →
+            <span class="md:hidden">→</span>
+            <span class="hidden md:inline">{locale === 'id' ? 'Selanjutnya' : 'Next'} →</span>
           </a>
         ) : (
-          <span class="px-4 py-2 rounded-lg bg-surface-100 text-gray-400 opacity-50 cursor-not-allowed">
-            {locale === 'id' ? 'Selanjutnya' : 'Next'} →
+          <span class="w-10 h-10 md:w-auto md:px-4 md:py-2 flex items-center justify-center rounded-lg bg-surface-100 text-gray-400 opacity-50 cursor-not-allowed">
+            <span class="md:hidden">→</span>
+            <span class="hidden md:inline">{locale === 'id' ? 'Selanjutnya' : 'Next'} →</span>
           </span>
         )}
       </div>

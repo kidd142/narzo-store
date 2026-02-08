@@ -1,4 +1,4 @@
-// functions/api/auth/logout.ts
+﻿// functions/api/auth/logout.ts
 export async function onRequestPost({ request, env }) {
   const cookies = request.headers.get('cookie') || '';
   const match = cookies.match(/session=([^;]+)/);

@@ -19,20 +19,6 @@ export interface Post {
   created_at: string;
 }
 
-export interface Product {
-  id: string;
-  slug: string;
-  name_id: string;
-  name_en: string | null;
-  description_id: string | null;
-  description_en: string | null;
-  price: number;
-  image_url: string | null;
-  category: string | null;
-  is_digital: number;
-  is_active: number;
-}
-
 export async function getPosts(db: D1Database | null, options: {
   limit?: number;
   offset?: number;
@@ -96,81 +82,6 @@ export async function getPostBySlug(db: D1Database | null, slug: string) {
   return await db.prepare(
     'SELECT * FROM posts WHERE slug = ? AND published = 1'
   ).bind(slug).first<Post>();
-}
-
-export async function getProducts(db: D1Database | null, options: {
-  limit?: number;
-  offset?: number;
-  category?: string;
-} | number = {}) {
-  // Handle legacy signature (limit only)
-  if (typeof options === 'number') {
-    options = { limit: options };
-  }
-
-  const { limit = 10, offset = 0, category } = options;
-
-  if (!db) {
-    console.warn('No database connection');
-    return [];
-  }
-
-  let query = 'SELECT * FROM products WHERE is_active = 1';
-  const params: any[] = [];
-  
-  if (category && category !== 'all') {
-    query += ' AND category = ?';
-    params.push(category);
-  }
-  
-  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-  params.push(limit, offset);
-
-  const result = await db.prepare(query).bind(...params).all<Product>();
-  return result.results;
-}
-
-export async function getTotalProducts(db: D1Database | null, category?: string) {
-  if (!db) return 0;
-  try {
-    let query = 'SELECT COUNT(*) as count FROM products WHERE is_active = 1';
-    const params: any[] = [];
-    
-    if (category && category !== 'all') {
-      query += ' AND category = ?';
-      params.push(category);
-    }
-    
-    const result = await db.prepare(query).bind(...params).first<{count: number}>();
-    return result?.count || 0;
-  } catch (error) {
-    return 0;
-  }
-}
-
-export async function getProductCategories(db: D1Database | null) {
-  if (!db) return [];
-  try {
-    // If using categories table
-    const result = await db.prepare(
-      'SELECT DISTINCT category FROM products WHERE is_active = 1 AND category IS NOT NULL'
-    ).all<{category: string}>();
-    return result.results.map(r => r.category).filter(Boolean);
-  } catch (error) {
-    console.error('Database Error in getProductCategories:', error);
-    return [];
-  }
-}
-
-export async function getProductBySlug(db: D1Database | null, slug: string) {
-  if (!db) {
-    console.warn('No database connection');
-    return null;
-  }
-  
-  return await db.prepare(
-    'SELECT * FROM products WHERE slug = ? AND is_active = 1'
-  ).bind(slug).first<Product>();
 }
 
 export async function incrementViews(db: D1Database | null, postId: string) {
@@ -285,4 +196,3 @@ export async function getChildCategories(db: D1Database | null, parentId: string
   
   return result.results || [];
 }
-

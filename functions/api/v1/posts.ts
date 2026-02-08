@@ -1,4 +1,4 @@
-// Posts API - CRUD operations
+﻿// Posts API - CRUD operations
 export async function onRequestPost({ request, env }) {
   try {
     const data = await request.json();
@@ -46,7 +46,7 @@ export async function onRequestPost({ request, env }) {
       success: true, 
       id,
       slug: data.slug,
-      url: `https://narzo.store/blog/${data.slug}`
+      url: `https://narzo.site/blog/${data.slug}`
     }), {
       headers: { 'Content-Type': 'application/json' }
     });

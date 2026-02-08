@@ -7,11 +7,11 @@ const locale = (Astro.locals as any).locale || 'id';
 
 <footer class="border-t border-surface-100 py-8 mt-auto">
   <div class="container mx-auto px-4 text-center">
-    <div class="flex flex-wrap justify-center gap-6 mb-4 text-sm text-gray-400">
-      <a href="/privacy" class="hover:text-accent transition-colors">{t(translations.footer.privacy, locale)}</a>
-      <a href="/terms" class="hover:text-accent transition-colors">{t(translations.footer.terms, locale)}</a>
-      <a href="/contact" class="hover:text-accent transition-colors">{t(translations.footer.contact, locale)}</a>
-    </div>
-    <p class="text-gray-500 text-sm">&copy; {year} Narzo Store. {t(translations.footer.rights, locale)}.</p>
+    <nav class="flex justify-center gap-6 text-sm mb-4">
+      <a href="/privacy" class="text-gray-500 hover:text-primary transition-colors">{t(translations.footer.privacy, locale)}</a>
+      <a href="/terms" class="text-gray-500 hover:text-primary transition-colors">{t(translations.footer.terms, locale)}</a>
+      <a href="/contact" class="text-gray-500 hover:text-primary transition-colors">{t(translations.footer.contact, locale)}</a>
+    </nav>
+    <p class="text-gray-500 text-sm">&copy; {year} Narzo. {t(translations.footer.rights, locale)}.</p>
   </div>
 </footer>

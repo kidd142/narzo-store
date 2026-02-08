@@ -6,30 +6,29 @@ interface Post {
   created_at: string;
 }
 
-interface Product {
-  slug: string;
-  updated_at?: string;
-  created_at: string;
-}
-
 interface Category {
   slug: string;
 }
 
 export async function GET(context: APIContext) {
-  const baseUrl = 'https://narzo.store';
+  const baseUrl = 'https://narzo.site';
   const db = context.locals?.runtime?.env?.DB;
 
-  // Static pages
+  // Static pages (blog-focused only)
   const staticPages = [
     { url: '', priority: '1.0', changefreq: 'daily' },
     { url: '/blog', priority: '0.9', changefreq: 'daily' },
-    { url: '/products', priority: '0.9', changefreq: 'daily' },
     { url: '/search', priority: '0.5', changefreq: 'weekly' },
   ];
 
+  // Active categories (blog-focused only)
+  const activeCategories = [
+    'tutorials', 'apps', 'how-to', 'gaming', 'entertainment',
+    'buying-guide', 'comparison', 'news', 'productivity', 'tech-news',
+    'finance', 'social-media', 'security', 'shopping', 'lifestyle'
+  ];
+
   let posts: Post[] = [];
-  let products: Product[] = [];
   let categories: Category[] = [];
 
   if (db) {
@@ -40,33 +39,16 @@ export async function GET(context: APIContext) {
       ).all();
       posts = (postsResult.results || []) as Post[];
 
-      // Products (Fix: active -> is_active)
-      const productsResult: any = await db.prepare(
-        'SELECT slug, created_at FROM products WHERE is_active = 1 ORDER BY created_at DESC'
-      ).all();
-      products = (productsResult.results || []) as Product[];
-
-      // Categories
+      // Categories - only active ones
       const categoriesResult: any = await db.prepare(
         'SELECT slug FROM categories ORDER BY sort_order ASC'
       ).all();
-      categories = (categoriesResult.results || []) as Category[];
+      const allCategories = (categoriesResult.results || []) as Category[];
+      categories = allCategories.filter(c => activeCategories.includes(c.slug));
 
     } catch (e) {
       console.error("Failed to fetch content for sitemap", e);
     }
-  } else {
-    // Fallback Mock Data if DB is not available
-    posts = [
-      { slug: 'hello-world', created_at: new Date().toISOString() }
-    ];
-    products = [
-      { slug: 'mobile-legends', created_at: new Date().toISOString() }
-    ];
-    categories = [
-      { slug: 'games' },
-      { slug: 'vouchers' }
-    ];
   }
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -86,12 +68,6 @@ ${posts.map(post => `  <url>
     <lastmod>${post.updated_at || post.created_at}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-  </url>`).join('\n')}
-${products.map(product => `  <url>
-    <loc>${baseUrl}/products/${product.slug}</loc>
-    <lastmod>${product.updated_at || product.created_at}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
   </url>`).join('\n')}
 </urlset>`;
 

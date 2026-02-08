@@ -21,26 +21,10 @@ const tr = translations.about;
     <!-- Content -->
     <div class="grid md:grid-cols-2 gap-12 mb-16">
       <div class="card">
-        <div class="text-4xl mb-4">🎮</div>
+        <div class="text-4xl mb-4">📝</div>
         <h2 class="text-2xl font-bold mb-4">{t(tr.mission_title, locale)}</h2>
         <p class="text-gray-400">
           {t(tr.mission_text, locale)}
-        </p>
-      </div>
-      
-      <div class="card">
-        <div class="text-4xl mb-4">⚡</div>
-        <h2 class="text-2xl font-bold mb-4">{t(tr.instant_title, locale)}</h2>
-        <p class="text-gray-400">
-          {t(tr.instant_text, locale)}
-        </p>
-      </div>
-      
-      <div class="card">
-        <div class="text-4xl mb-4">🔒</div>
-        <h2 class="text-2xl font-bold mb-4">{t(tr.secure_title, locale)}</h2>
-        <p class="text-gray-400">
-          {t(tr.secure_text, locale)}
         </p>
       </div>
       
@@ -56,18 +40,10 @@ const tr = translations.about;
     <!-- Stats -->
     <section class="bg-surface-50 rounded-2xl p-8 md:p-12 text-center">
       <h2 class="text-2xl font-bold mb-8">{t(tr.stats_title, locale)}</h2>
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div class="grid grid-cols-2 gap-8">
         <div>
           <div class="text-4xl font-bold text-accent">10K+</div>
           <div class="text-gray-400">{t(tr.customers, locale)}</div>
-        </div>
-        <div>
-          <div class="text-4xl font-bold text-accent">50K+</div>
-          <div class="text-gray-400">{t(tr.transactions, locale)}</div>
-        </div>
-        <div>
-          <div class="text-4xl font-bold text-accent">100+</div>
-          <div class="text-gray-400">{t(tr.products, locale)}</div>
         </div>
         <div>
           <div class="text-4xl font-bold text-accent">4.9★</div>
@@ -78,10 +54,10 @@ const tr = translations.about;
 
     <!-- CTA -->
     <section class="text-center mt-16">
-      <h2 class="text-2xl font-bold mb-4">{t(tr.cta_title, locale)}</h2>
-      <p class="text-gray-400 mb-8">{t(tr.cta_text, locale)}</p>
-      <a href="/products" class="btn-primary inline-block">
-        {t(tr.view_products, locale)}
+      <h2 class="text-2xl font-bold mb-4">{locale === 'en' ? 'Explore Our Content' : 'Jelajahi Konten Kami'}</h2>
+      <p class="text-gray-400 mb-8">{locale === 'en' ? 'Discover interesting articles about technology and digital lifestyle.' : 'Temukan artikel-artikel menarik tentang teknologi dan digital lifestyle.'}</p>
+      <a href="/blog" class="btn-primary inline-block">
+        {locale === 'en' ? 'Read Articles' : 'Baca Artikel'}
       </a>
     </section>
   </div>

@@ -27,11 +27,11 @@ const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 // Get related posts by category
 const relatedPosts = await getRelatedPosts(db, post.category, post.id, 3);
 
-const pageUrl = `https://narzo.store/blog/${post.slug}`;
+const pageUrl = `https://narzo.site/blog/${post.slug}`;
 const enableAds = post.enable_ads === 1;
 
 // Dynamic OG image - use article cover or fallback
-const ogImage = post.cover_image || 'https://narzo.store/og-image.svg';
+const ogImage = post.cover_image || 'https://narzo.site/og-image.svg';
 
 // Article structured data (BlogPosting schema)
 const articleSchema = {
@@ -44,14 +44,14 @@ const articleSchema = {
   "dateModified": post.updated_at || post.created_at,
   "author": {
     "@type": "Organization",
-    "name": "Narzo Store"
+    "name": "Narzo"
   },
   "publisher": {
     "@type": "Organization",
-    "name": "Narzo Store",
+    "name": "Narzo",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://narzo.store/favicon.svg"
+      "url": "https://narzo.site/favicon.svg"
     }
   },
   "mainEntityOfPage": {
@@ -72,13 +72,13 @@ const breadcrumbSchema = {
       "@type": "ListItem",
       "position": 1,
       "name": locale === 'id' ? "Beranda" : "Home",
-      "item": "https://narzo.store"
+      "item": "https://narzo.site"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Blog",
-      "item": "https://narzo.store/blog"
+      "item": "https://narzo.site/blog"
     },
     {
       "@type": "ListItem",

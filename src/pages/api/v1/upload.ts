@@ -67,7 +67,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
     
     // Return public URL
-    const url = `https://media.narzo.store/${path}`;
+    const url = `https://media.narzo.site/${path}`;
     
     return new Response(JSON.stringify({ 
       success: true,

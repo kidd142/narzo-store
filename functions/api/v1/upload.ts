@@ -1,4 +1,4 @@
-// Upload API - Image upload to R2
+﻿// Upload API - Image upload to R2
 export async function onRequestPost({ request, env }) {
   try {
     const form = await request.formData();
@@ -49,7 +49,7 @@ export async function onRequestPost({ request, env }) {
     });
     
     // Return public URL
-    const url = `https://media.narzo.store/${path}`;
+    const url = `https://media.narzo.site/${path}`;
     
     return new Response(JSON.stringify({ 
       success: true,

@@ -25,8 +25,6 @@ const { title } = Astro.props;
         <a href="/admin" class="block px-4 py-2 rounded hover:bg-surface-100">Dashboard</a>
         <a href="/admin/posts" class="block px-4 py-2 rounded hover:bg-surface-100">Posts</a>
         <a href="/admin/categories" class="block px-4 py-2 rounded hover:bg-surface-100">Categories</a>
-        <a href="/admin/products" class="block px-4 py-2 rounded hover:bg-surface-100">Products</a>
-        <a href="/admin/transactions" class="block px-4 py-2 rounded hover:bg-surface-100">Transactions</a>
         <hr class="border-surface-100 my-4" />
         <a href="/" class="block px-4 py-2 rounded hover:bg-surface-100">← Back to Site</a>
         <form action="/api/auth/logout" method="POST">
@@ -47,12 +45,6 @@ const { title } = Astro.props;
     async function deletePost(id) {
       if (!confirm('Delete this post?')) return;
       await fetch('/api/admin/posts', { method: 'DELETE', body: JSON.stringify({ id }) });
-      location.reload();
-    }
-    
-    async function deleteProduct(id) {
-      if (!confirm('Delete this product?')) return;
-      await fetch('/api/admin/products', { method: 'DELETE', body: JSON.stringify({ id }) });
       location.reload();
     }
     

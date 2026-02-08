@@ -1,4 +1,4 @@
-// functions/api/admin/upload.ts
+﻿// functions/api/admin/upload.ts
 export async function onRequestPost({ request, env }) {
   const form = await request.formData();
   const file = form.get('file') as File;
@@ -29,7 +29,7 @@ export async function onRequestPost({ request, env }) {
   });
   
   // Return public URL
-  const url = `https://media.narzo.store/${path}`;
+  const url = `https://media.narzo.site/${path}`;
   // Or use R2 public URL: https://<bucket>.r2.cloudflarestorage.com/${path}
   
   return new Response(JSON.stringify({ 

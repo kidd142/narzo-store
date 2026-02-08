@@ -44,46 +44,33 @@ export const translations = {
   nav: {
     home: { id: 'Beranda', en: 'Home' },
     blog: { id: 'Blog', en: 'Blog' },
-    products: { id: 'Produk', en: 'Products' },
     search: { id: 'Cari', en: 'Search' },
     about: { id: 'Tentang', en: 'About' }
   },
   home: {
-    hero_title: { id: 'Artikel Digital & Marketplace Terpercaya', en: 'Trusted Digital Articles & Marketplace' },
-    hero_subtitle: { id: 'Baca artikel menarik seputar teknologi, digital lifestyle, dan temukan produk digital terbaik', en: 'Read interesting articles about technology, digital lifestyle, and find the best digital products' },
+    hero_title: { id: 'Blog Digital & Teknologi Terkini', en: 'Latest Digital & Tech Blog' },
+    hero_subtitle: { id: 'Baca artikel menarik seputar teknologi, digital lifestyle, tips, dan tutorial', en: 'Read interesting articles about technology, digital lifestyle, tips, and tutorials' },
     shop_now: { id: 'Baca Artikel', en: 'Read Articles' },
-    about_us: { id: 'Belanja Produk', en: 'Shop Products' },
-    featured_products: { id: 'Produk Pilihan', en: 'Selected Products' },
-    featured_subtitle: { id: 'Pilihan terbaik untuk kebutuhan digitalmu', en: 'Best picks for your digital needs' },
-    view_all: { id: 'Lihat Semua', en: 'View All' },
     latest_articles: { id: 'Artikel Terbaru', en: 'Latest Articles' },
     articles_subtitle: { id: 'Tips, trik, dan berita digital terkini', en: 'Latest digital tips, tricks, and news' },
-    cta_title: { id: 'Siap Berbelanja?', en: 'Ready to Shop?' },
-    cta_text: { id: 'Bergabunglah dengan ribuan pelanggan lainnya. Dapatkan harga terbaik dan proses instan hanya di Narzo Store.', en: 'Join thousands of other customers. Get the best prices and instant processing only at Narzo Store.' },
-    cta_button: { id: 'Mulai Belanja Sekarang', en: 'Start Shopping Now' }
+    view_all: { id: 'Lihat Semua', en: 'View All' },
+    cta_title: { id: 'Jelajahi Lebih Banyak', en: 'Explore More' },
+    cta_text: { id: 'Temukan artikel-artikel menarik lainnya tentang teknologi dan digital lifestyle.', en: 'Discover more interesting articles about technology and digital lifestyle.' },
+    cta_button: { id: 'Lihat Semua Artikel', en: 'View All Articles' }
   },
   about: {
     title: { id: 'Tentang Kami', en: 'About Us' },
     subtitle: { 
-      id: 'Narzo Store adalah platform blog dan media digital dengan fokus konten teknologi, lifestyle, dan edukasi. Fitur marketplace menyediakan berbagai produk digital seperti e-book, template, kursus, software, lisensi, dan produk digital partner/affiliate.', 
-      en: 'Narzo Store is a blog and digital media platform focused on technology, lifestyle, and educational content. Our marketplace features various digital products including e-books, templates, courses, software, licenses, and partner/affiliate digital products.' 
+      id: 'Narzo adalah platform blog dan media digital dengan fokus konten teknologi, lifestyle, dan edukasi.', 
+      en: 'Narzo is a blog and digital media platform focused on technology, lifestyle, and educational content.' 
     },
     mission_title: { id: 'Misi Kami', en: 'Our Mission' },
-    mission_text: { id: 'Menyediakan konten berkualitas dan produk digital terbaik dengan harga terjangkau, proses cepat, dan keamanan terjamin.', en: 'Providing quality content and the best digital products at affordable prices, with fast processing and guaranteed security.' },
-    instant_title: { id: 'Proses Instan', en: 'Instant Processing' },
-    instant_text: { id: 'Dengan sistem otomatis, pesanan Anda akan diproses dalam hitungan detik setelah pembayaran berhasil dikonfirmasi.', en: 'With our automated system, your order will be processed within seconds after payment is confirmed.' },
-    secure_title: { id: 'Aman & Terpercaya', en: 'Safe & Trusted' },
-    secure_text: { id: 'Semua transaksi dilindungi dengan enkripsi SSL dan kami bekerja sama dengan payment gateway terpercaya di Indonesia.', en: 'All transactions are protected with SSL encryption and we partner with trusted payment gateways in Indonesia.' },
+    mission_text: { id: 'Menyediakan konten berkualitas seputar teknologi dan digital lifestyle yang bermanfaat bagi pembaca.', en: 'Providing quality content about technology and digital lifestyle that benefits readers.' },
     support_title: { id: 'Support 24/7', en: '24/7 Support' },
     support_text: { id: 'Tim kami siap membantu Anda kapan saja melalui email atau halaman kontak.', en: 'Our team is ready to help you anytime via email or contact page.' },
     stats_title: { id: 'Dipercaya oleh Ribuan Pembaca', en: 'Trusted by Thousands of Readers' },
     customers: { id: 'Pembaca', en: 'Readers' },
-    transactions: { id: 'Transaksi', en: 'Transactions' },
-    products: { id: 'Produk Digital', en: 'Digital Products' },
-    rating: { id: 'Rating', en: 'Rating' },
-    cta_title: { id: 'Siap Berbelanja?', en: 'Ready to Shop?' },
-    cta_text: { id: 'Jelajahi koleksi produk digital kami sekarang!', en: 'Explore our digital product collection now!' },
-    view_products: { id: 'Lihat Produk', en: 'View Products' }
+    rating: { id: 'Rating', en: 'Rating' }
   },
   blog: {
     title: { id: 'Blog', en: 'Blog' },
@@ -93,12 +80,6 @@ export const translations = {
     no_posts: { id: 'Belum ada artikel', en: 'No articles yet' },
     related: { id: 'Artikel Terkait', en: 'Related Articles' },
     share: { id: 'Bagikan artikel ini', en: 'Share this article' }
-  },
-  products: {
-    title: { id: 'Produk', en: 'Products' },
-    no_products: { id: 'Belum ada produk', en: 'No products yet' },
-    buy_now: { id: 'Beli Sekarang', en: 'Buy Now' },
-    add_to_cart: { id: 'Tambah ke Keranjang', en: 'Add to Cart' }
   },
   notfound: {
     title: { id: 'Tidak Ditemukan', en: 'Not Found' },

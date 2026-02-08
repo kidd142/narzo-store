@@ -1,9 +1,20 @@
 name = "narzo-store"
+main = "dist/_worker.js"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "dist"
 
-# Bindings are managed via Cloudflare Dashboard for Pages project
-# D1: DB = narzo-db
-# KV: SESSIONS
-# R2: MEDIA = narzo-media
+[assets]
+directory = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "narzo-db"
+database_id = "93680d63-befd-4a65-adbb-0a8e08181639"
+
+[[kv_namespaces]]
+binding = "SESSIONS"
+id = "fda35e24a56542b7ba803fd66965a1d3"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "narzo-media"

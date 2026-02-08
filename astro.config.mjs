@@ -3,7 +3,7 @@ import tailwind from '@astrojs/tailwind';
 import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
-  site: 'https://narzo.store',
+  site: 'https://narzo.site',
   output: 'server',
   adapter: cloudflare({
     mode: 'directory',

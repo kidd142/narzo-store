@@ -11,16 +11,16 @@ export interface Props {
 
 const {
   title,
-  description = "Narzo Store - Platform blog dan marketplace produk digital. Konten teknologi, lifestyle, edukasi + produk digital (e-book, template, kursus, software).",
+  description = "Narzo - Platform blog dan marketplace produk digital. Konten teknologi, lifestyle, edukasi + produk digital (e-book, template, kursus, software).",
   image = "/og-image.svg",
   article = false,
   publishedTime,
-  author = "Narzo Store",
+  author = "Narzo",
   ignoreSiteName = false,
 } = Astro.props;
 
-const siteName = "Narzo Store";
-const siteUrl = "https://narzo.store";
+const siteName = "Narzo";
+const siteUrl = "https://narzo.site";
 const canonicalURL = new URL(Astro.url.pathname, siteUrl);
 const socialImageURL = new URL(image, siteUrl);
 

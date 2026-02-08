@@ -132,7 +132,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       success: true, 
       id,
       slug: data.slug,
-      url: `https://narzo.store/blog/${data.slug}`
+      url: `https://narzo.site/blog/${data.slug}`
     }), {
       headers: { 'Content-Type': 'application/json' }
     });

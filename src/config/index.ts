@@ -1,8 +1,8 @@
 export const config = {
   // Site info
   site: {
-    name: import.meta.env.SITE_NAME || 'Narzo Store',
-    url: import.meta.env.SITE_URL || 'https://narzo.store',
+    name: import.meta.env.SITE_NAME || 'Narzo',
+    url: import.meta.env.SITE_URL || 'https://narzo.site',
     locale: 'id',
     locales: ['id', 'en'],
   },
@@ -10,9 +10,7 @@ export const config = {
   // Feature flags
   features: {
     blog: true,
-    products: true,
     search: true,
-    payment: !!import.meta.env.TRIPAY_API_KEY,
     ads: import.meta.env.ADSENSE_ENABLED === 'true',
     analytics: false,
     comments: false,
@@ -22,20 +20,6 @@ export const config = {
   // Admin settings
   admin: {
     email: import.meta.env.ADMIN_EMAIL,
-  },
-  
-  // Payment provider config
-  payment: {
-    provider: 'tripay',
-    tripay: {
-      apiKey: import.meta.env.TRIPAY_API_KEY,
-      privateKey: import.meta.env.TRIPAY_PRIVATE_KEY,
-      merchantCode: import.meta.env.TRIPAY_MERCHANT_CODE,
-      sandbox: import.meta.env.TRIPAY_SANDBOX !== 'false',
-      baseUrl: import.meta.env.TRIPAY_SANDBOX !== 'false'
-        ? 'https://tripay.co.id/api-sandbox'
-        : 'https://tripay.co.id/api',
-    },
   },
   
   // Ads provider config
@@ -52,7 +36,7 @@ export const config = {
     },
   },
   
-  // Storage config
+  // Storage config (for images only)
   storage: {
     provider: 'r2',
     maxFileSize: 5 * 1024 * 1024,

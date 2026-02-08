@@ -1,4 +1,4 @@
-// API Key Authentication Middleware
+﻿// API Key Authentication Middleware
 export async function onRequest({ request, env, next }) {
   const apiKey = request.headers.get('X-API-Key');
   
