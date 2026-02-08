@@ -16,9 +16,9 @@ export default {
       // Color palette
       colors: {
         primary: {
-          DEFAULT: '#8b5cf6', // Violet
-          dark: '#7c3aed',
-          light: '#a78bfa'
+          DEFAULT: '#7c3aed', // Darker Violet for better contrast
+          dark: '#6d28d9',
+          light: '#8b5cf6'
         },
         surface: {
           DEFAULT: '#0a0a0a',
