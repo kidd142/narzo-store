@@ -1,7 +1,7 @@
 ---
-import Layout from '../../layouts/Layout.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 
-const { ref } = Astro.url.searchParams;
+const ref = Astro.url.searchParams.get('ref');
 const env = Astro.locals.runtime.env;
 const DB = env.DB;
 
@@ -120,4 +120,4 @@ if (!order) {
 
     </div>
   </div>
-</Layout>
+</BaseLayout>
