@@ -44,7 +44,7 @@ const { title, excerpt } = getLocalizedArticle(post, locale);
   
   {excerpt && <p class="text-gray-400 line-clamp-2">{excerpt}</p>}
   
-  <div class="mt-4 flex justify-between text-sm text-gray-500">
+  <div class="mt-4 flex justify-between text-sm text-gray-400">
     <span>{new Date(post.created_at).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
     <span>{post.views} views</span>
   </div>

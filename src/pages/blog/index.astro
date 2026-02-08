@@ -114,7 +114,7 @@ function getPaginationUrl(page: number) {
     </div>
     
     {posts.length === 0 && (
-      <p class="text-gray-500 text-center py-12">
+      <p class="text-gray-400 text-center py-12">
         {t(tr.no_posts, locale)}
       </p>
     )}
@@ -131,7 +131,7 @@ function getPaginationUrl(page: number) {
             ← {locale === 'id' ? 'Sebelumnya' : 'Previous'}
           </a>
         ) : (
-          <span class="px-4 py-2 rounded-lg bg-surface-100 text-gray-500 opacity-50 cursor-not-allowed">
+          <span class="px-4 py-2 rounded-lg bg-surface-100 text-gray-400 opacity-50 cursor-not-allowed">
             ← {locale === 'id' ? 'Sebelumnya' : 'Previous'}
           </span>
         )}
@@ -162,7 +162,7 @@ function getPaginationUrl(page: number) {
             {locale === 'id' ? 'Selanjutnya' : 'Next'} →
           </a>
         ) : (
-          <span class="px-4 py-2 rounded-lg bg-surface-100 text-gray-500 opacity-50 cursor-not-allowed">
+          <span class="px-4 py-2 rounded-lg bg-surface-100 text-gray-400 opacity-50 cursor-not-allowed">
             {locale === 'id' ? 'Selanjutnya' : 'Next'} →
           </span>
         )}
@@ -171,7 +171,7 @@ function getPaginationUrl(page: number) {
     
     <!-- Post Count Info -->
     {totalPosts > 0 && (
-      <p class="mt-6 text-center text-sm text-gray-500">
+      <p class="mt-6 text-center text-sm text-gray-400">
         {locale === 'id' 
           ? `Menampilkan ${offset + 1}-${Math.min(offset + posts.length, totalPosts)} dari ${totalPosts} artikel`
           : `Showing ${offset + 1}-${Math.min(offset + posts.length, totalPosts)} of ${totalPosts} articles`

@@ -110,7 +110,7 @@ if (enableAds && wordCount > 300) {
   <div class="container mx-auto px-4 py-12">
     <!-- Breadcrumbs -->
     <nav class="mb-6 text-sm" aria-label="Breadcrumb">
-      <ol class="flex items-center gap-2 text-gray-500">
+      <ol class="flex items-center gap-2 text-gray-400">
         <li>
           <a href="/" class="hover:text-accent transition-colors">
             {locale === 'id' ? 'Beranda' : 'Home'}
@@ -148,7 +148,7 @@ if (enableAds && wordCount > 300) {
         
         <h1 class="text-3xl md:text-4xl font-bold mb-4">{title}</h1>
         
-        <div class="flex flex-wrap gap-4 text-gray-500 mb-6">
+        <div class="flex flex-wrap gap-4 text-gray-400 mb-6">
           {post.category && (
             <a href={`/blog?category=${post.category}`} class="badge-info hover:bg-accent/30 transition-colors">
               {post.category}
@@ -205,7 +205,7 @@ if (enableAds && wordCount > 300) {
         
         <!-- Share buttons bottom -->
         <div class="mt-8 pt-8 border-t border-surface-100">
-          <p class="text-gray-500 mb-4">{t(tr.share, locale)}:</p>
+          <p class="text-gray-400 mb-4">{t(tr.share, locale)}:</p>
           <ShareButtons url={pageUrl} title={title} />
         </div>
       </article>
