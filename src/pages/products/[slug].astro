@@ -13,78 +13,166 @@ if (!product) return Astro.redirect('/404');
 const locale = (Astro.locals as any).locale || 'id';
 const tr = translations.products;
 const name = t({ id: product.name_id, en: product.name_en }, locale);
-const desc = t({ id: product.description_id, en: product.description_en }, locale);
-
-// Simple markdown to HTML converter
-function parseMarkdown(text: string): string {
-  if (!text) return '';
-  return text
-    // Bold **text**
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    // Bullet points
-    .replace(/^• /gm, '<li>')
-    .replace(/<li>(.+)$/gm, '<li>$1</li>')
-    // Checkmarks
-    .replace(/✅/g, '<span class="text-green-400">✅</span>')
-    // Line breaks
-    .replace(/\n\n/g, '</p><p class="mt-4">')
-    .replace(/\n/g, '<br>');
-}
-
-const descHtml = parseMarkdown(desc || '');
+const desc = t({ id: product.description_id, en: product.description_en }, locale) || '';
 
 // Check if payment is configured
 const paymentEnabled = !!Astro.locals?.runtime?.env?.TRIPAY_API_KEY;
 
 const digitalNote = locale === 'en' 
-  ? '🔗 Digital product - link will be sent via email'
-  : '🔗 Produk digital - link akan dikirim via email';
+  ? 'Digital product - link will be sent via email'
+  : 'Produk digital - link akan dikirim via email';
+
+const buyNowText = locale === 'en' ? 'Buy Now' : 'Beli Sekarang';
+const formatLabel = locale === 'en' ? 'Format' : 'Format';
+const pagesLabel = locale === 'en' ? 'Pages' : 'Halaman';
+const languageLabel = locale === 'en' ? 'Language' : 'Bahasa';
+const updatesLabel = locale === 'en' ? 'Updates' : 'Update';
 ---
 
 <BaseLayout title={name}>
-  <div class="container mx-auto px-4 py-12">
-    <div class="grid md:grid-cols-2 gap-12">
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Breadcrumb -->
+    <nav class="text-sm text-gray-500 mb-6">
+      <a href="/" class="hover:text-accent">Home</a>
+      <span class="mx-2">/</span>
+      <a href="/products" class="hover:text-accent">{locale === 'en' ? 'Products' : 'Produk'}</a>
+      <span class="mx-2">/</span>
+      <span class="text-gray-400">{name}</span>
+    </nav>
+
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
       <!-- Image -->
-      <div>
+      <div class="sticky top-24">
         {product.image_url ? (
           <img src={product.image_url} alt={name}
-               class="w-full rounded-xl" />
+               class="w-full rounded-2xl shadow-xl" loading="lazy" />
         ) : (
-          <div class="w-full aspect-square bg-surface-50 rounded-xl flex items-center justify-center">
+          <div class="w-full aspect-square bg-surface-50 rounded-2xl flex items-center justify-center">
             <span class="text-gray-500">No Image</span>
           </div>
         )}
       </div>
       
       <!-- Details -->
-      <div>
-        <h1 class="text-4xl font-bold mb-4">{name}</h1>
-        
-        <p class="text-3xl font-bold text-accent mb-6">
-          Rp {product.price.toLocaleString()}
-        </p>
-        
-        {descHtml && (
-          <div class="text-gray-400 mb-8 prose prose-invert prose-sm max-w-none">
-            <p set:html={descHtml}></p>
+      <div class="space-y-6">
+        <div>
+          <h1 class="text-3xl lg:text-4xl font-bold mb-3">{name}</h1>
+          <p class="text-4xl font-bold text-accent">
+            Rp {product.price.toLocaleString('id-ID')}
+          </p>
+        </div>
+
+        <!-- Quick Info -->
+        {product.is_digital && (
+          <div class="flex items-center gap-2 text-sm text-green-400 bg-green-400/10 px-4 py-2 rounded-lg w-fit">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            <span>{digitalNote}</span>
           </div>
         )}
-        
-        {paymentEnabled ? (
-          <a href={`/checkout/${product.id}`} class="btn-primary inline-block">
-            {t(tr.buy_now, locale)}
-          </a>
-        ) : (
-          <span class="inline-block px-6 py-3 bg-surface-50 rounded-lg text-gray-500">
-            Coming Soon
-          </span>
-        )}
-        
-        {product.is_digital && (
-          <p class="mt-4 text-sm text-gray-500">
-            {digitalNote}
-          </p>
-        )}
+
+        <!-- Buy Button -->
+        <div class="pt-2">
+          {paymentEnabled ? (
+            <a href={`/checkout/${product.id}`} class="inline-flex items-center gap-2 bg-accent hover:bg-accent-hover text-white font-bold py-4 px-8 rounded-xl text-lg transition-all hover:scale-105">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              {buyNowText}
+            </a>
+          ) : (
+            <span class="inline-block px-8 py-4 bg-surface-50 rounded-xl text-gray-500 text-lg">
+              Coming Soon
+            </span>
+          )}
+        </div>
+
+        <!-- Specifications Card -->
+        <div class="bg-surface-50 rounded-2xl p-6 border border-surface-200/50">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            {locale === 'en' ? 'Specifications' : 'Spesifikasi'}
+          </h3>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-500">{formatLabel}</span>
+              <span class="text-gray-300 font-medium">PDF</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">{pagesLabel}</span>
+              <span class="text-gray-300 font-medium">150+</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">{languageLabel}</span>
+              <span class="text-gray-300 font-medium">ID & EN</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">{updatesLabel}</span>
+              <span class="text-gray-300 font-medium">Lifetime</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="bg-surface-50 rounded-2xl p-6 border border-surface-200/50">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {locale === 'en' ? 'What You\'ll Learn' : 'Yang Akan Kamu Pelajari'}
+          </h3>
+          <ul class="space-y-3 text-gray-400">
+            <li class="flex items-start gap-3">
+              <span class="text-accent mt-1">✓</span>
+              <span><strong class="text-gray-300">SEO</strong> - {locale === 'en' ? 'Latest techniques to rank on Google' : 'Teknik terbaru untuk ranking di Google'}</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-accent mt-1">✓</span>
+              <span><strong class="text-gray-300">Social Media</strong> - {locale === 'en' ? 'Content strategies for all platforms' : 'Strategi konten untuk semua platform'}</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-accent mt-1">✓</span>
+              <span><strong class="text-gray-300">Content Marketing</strong> - {locale === 'en' ? 'Create viral and engaging content' : 'Buat konten viral dan engaging'}</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-accent mt-1">✓</span>
+              <span><strong class="text-gray-300">Paid Ads</strong> - Google Ads, Meta Ads, TikTok Ads</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-accent mt-1">✓</span>
+              <span><strong class="text-gray-300">Email Marketing</strong> - {locale === 'en' ? 'Automation and segmentation' : 'Automasi dan segmentasi'}</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-accent mt-1">✓</span>
+              <span><strong class="text-gray-300">Analytics</strong> - {locale === 'en' ? 'Read data for optimization' : 'Baca data untuk optimasi'}</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Bonus Card -->
+        <div class="bg-gradient-to-br from-accent/20 to-purple-600/20 rounded-2xl p-6 border border-accent/30">
+          <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+            <span class="text-xl">🎁</span>
+            {locale === 'en' ? 'Bonus Included' : 'Bonus'}
+          </h3>
+          <ul class="space-y-2 text-gray-300">
+            <li class="flex items-center gap-2">
+              <span class="text-green-400">✅</span>
+              Content Calendar Template
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-400">✅</span>
+              SEO On-Page Checklist
+            </li>
+            <li class="flex items-center gap-2">
+              <span class="text-green-400">✅</span>
+              {locale === 'en' ? 'Exclusive Community Access' : 'Akses Komunitas Eksklusif'}
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
