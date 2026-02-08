@@ -90,6 +90,22 @@ CREATE TABLE IF NOT EXISTS page_views (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tripay Orders
+CREATE TABLE IF NOT EXISTS orders (
+  id TEXT PRIMARY KEY,
+  merchant_ref TEXT UNIQUE,
+  customer_name TEXT,
+  customer_email TEXT,
+  customer_phone TEXT,
+  amount INTEGER,
+  payment_method TEXT,
+  payment_status TEXT DEFAULT 'UNPAID',
+  tripay_reference TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  paid_at DATETIME,
+  order_items TEXT -- JSON string for items
+);
+
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
 CREATE INDEX IF NOT EXISTS idx_posts_published ON posts(published);
