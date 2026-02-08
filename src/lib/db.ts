@@ -34,6 +34,7 @@ export interface Product {
 
 export async function getPosts(db: D1Database | null, options: {
   limit?: number;
+  offset?: number;
   category?: string;
   featured?: boolean;
 } = {}) {
@@ -42,7 +43,7 @@ export async function getPosts(db: D1Database | null, options: {
     return [];
   }
 
-  const { limit = 10, category, featured } = options;
+  const { limit = 10, offset = 0, category, featured } = options;
   
   let query = 'SELECT * FROM posts WHERE published = 1';
   const params: any[] = [];
@@ -55,11 +56,34 @@ export async function getPosts(db: D1Database | null, options: {
     query += ' AND featured = 1';
   }
   
-  query += ' ORDER BY created_at DESC LIMIT ?';
+  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
   params.push(limit);
+  params.push(offset);
   
   const result = await db.prepare(query).bind(...params).all<Post>();
   return result.results;
+}
+
+export async function getPostsCount(db: D1Database | null, options: {
+  category?: string;
+} = {}) {
+  if (!db) {
+    console.warn('No database connection');
+    return 0;
+  }
+
+  const { category } = options;
+  
+  let query = 'SELECT COUNT(*) as count FROM posts WHERE published = 1';
+  const params: any[] = [];
+  
+  if (category) {
+    query += ' AND category = ?';
+    params.push(category);
+  }
+  
+  const result = await db.prepare(query).bind(...params).first<{ count: number }>();
+  return result?.count || 0;
 }
 
 export async function getPostBySlug(db: D1Database | null, slug: string) {

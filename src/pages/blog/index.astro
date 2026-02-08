@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArticleCard from '../../components/ArticleCard.astro';
-import { getPosts, getCategories } from '../../lib/db';
+import { getPosts, getPostsCount, getCategories } from '../../lib/db';
 import { t, translations } from '../../lib/i18n';
 
 const db = Astro.locals.runtime.env.DB;
@@ -9,21 +9,43 @@ const categories = await getCategories(db);
 const locale = (Astro.locals as any).locale || 'id';
 const tr = translations.blog;
 
-// Get category from URL params
+// Get params from URL
 const url = new URL(Astro.request.url);
 const activeCategory = url.searchParams.get('category');
+const currentPage = parseInt(url.searchParams.get('page') || '1');
 
-// Get posts (filtered by category if specified)
-const posts = await getPosts(db, { 
-  limit: 12,
-  category: activeCategory || undefined
-});
+// Pagination config
+const POSTS_PER_PAGE = 9;
+const offset = (currentPage - 1) * POSTS_PER_PAGE;
+
+// Get posts and total count
+const [posts, totalPosts] = await Promise.all([
+  getPosts(db, { 
+    limit: POSTS_PER_PAGE,
+    offset,
+    category: activeCategory || undefined
+  }),
+  getPostsCount(db, {
+    category: activeCategory || undefined
+  })
+]);
+
+const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
 
 // Find active parent category for showing children
 const activeParent = categories.find(cat => 
   cat.slug === activeCategory || 
   (cat.children && cat.children.some(child => child.slug === activeCategory))
 );
+
+// Build pagination URL helper
+function getPaginationUrl(page: number) {
+  const params = new URLSearchParams();
+  if (activeCategory) params.set('category', activeCategory);
+  if (page > 1) params.set('page', page.toString());
+  const queryString = params.toString();
+  return `/blog${queryString ? '?' + queryString : ''}`;
+}
 ---
 
 <BaseLayout title={t(tr.title, locale)}>
@@ -84,6 +106,7 @@ const activeParent = categories.find(cat =>
       )}
     </div>
     
+    <!-- Posts Grid -->
     <div class="grid md:grid-cols-3 gap-6">
       {posts.map(post => (
         <ArticleCard post={post} locale={locale} />
@@ -93,6 +116,66 @@ const activeParent = categories.find(cat =>
     {posts.length === 0 && (
       <p class="text-gray-500 text-center py-12">
         {t(tr.no_posts, locale)}
+      </p>
+    )}
+    
+    <!-- Pagination -->
+    {totalPages > 1 && (
+      <div class="mt-12 flex justify-center items-center gap-2">
+        <!-- Previous -->
+        {currentPage > 1 ? (
+          <a 
+            href={getPaginationUrl(currentPage - 1)}
+            class="px-4 py-2 rounded-lg bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors"
+          >
+            ← {locale === 'id' ? 'Sebelumnya' : 'Previous'}
+          </a>
+        ) : (
+          <span class="px-4 py-2 rounded-lg bg-surface-100 text-gray-500 opacity-50 cursor-not-allowed">
+            ← {locale === 'id' ? 'Sebelumnya' : 'Previous'}
+          </span>
+        )}
+        
+        <!-- Page Numbers -->
+        <div class="flex items-center gap-1">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <a
+              href={getPaginationUrl(page)}
+              class:list={[
+                "w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors",
+                page === currentPage
+                  ? "bg-accent text-white"
+                  : "bg-surface-100 text-gray-300 hover:bg-surface-50"
+              ]}
+            >
+              {page}
+            </a>
+          ))}
+        </div>
+        
+        <!-- Next -->
+        {currentPage < totalPages ? (
+          <a 
+            href={getPaginationUrl(currentPage + 1)}
+            class="px-4 py-2 rounded-lg bg-surface-100 text-gray-300 hover:bg-surface-50 transition-colors"
+          >
+            {locale === 'id' ? 'Selanjutnya' : 'Next'} →
+          </a>
+        ) : (
+          <span class="px-4 py-2 rounded-lg bg-surface-100 text-gray-500 opacity-50 cursor-not-allowed">
+            {locale === 'id' ? 'Selanjutnya' : 'Next'} →
+          </span>
+        )}
+      </div>
+    )}
+    
+    <!-- Post Count Info -->
+    {totalPosts > 0 && (
+      <p class="mt-6 text-center text-sm text-gray-500">
+        {locale === 'id' 
+          ? `Menampilkan ${offset + 1}-${Math.min(offset + posts.length, totalPosts)} dari ${totalPosts} artikel`
+          : `Showing ${offset + 1}-${Math.min(offset + posts.length, totalPosts)} of ${totalPosts} articles`
+        }
       </p>
     )}
   </div>
