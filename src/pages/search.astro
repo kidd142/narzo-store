@@ -1,43 +1,146 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
-import type { Post } from '../lib/db';
+import type { Post, Product } from '../lib/db';
 import { t, translations } from '../lib/i18n';
 
 const rawQuery = Astro.url.searchParams.get('q') || '';
+const type = Astro.url.searchParams.get('type') || 'all'; // all, blog, products
 // Sanitize query - remove HTML tags and limit length
 const query = rawQuery.replace(/<[^>]*>/g, '').slice(0, 100);
 const db = Astro.locals.runtime.env.DB;
 const locale = (Astro.locals as any).locale || 'id';
 const tr = translations.search;
 
-let results: Post[] = [];
+let posts: Post[] = [];
+let products: Product[] = [];
+
 if (query.length >= 2) {
   const q = `%${query}%`;
-  const r = await db.prepare(`
-    SELECT * FROM posts WHERE published = 1 
-    AND (title_id LIKE ? OR title_en LIKE ?)
-    ORDER BY views DESC LIMIT 20
-  `).bind(q, q).all<Post>();
-  results = r.results;
+  
+  // Search posts
+  if (type === 'all' || type === 'blog') {
+    const postResults = await db.prepare(`
+      SELECT * FROM posts WHERE published = 1 
+      AND (title_id LIKE ? OR title_en LIKE ? OR excerpt_id LIKE ? OR excerpt_en LIKE ?)
+      ORDER BY views DESC LIMIT 20
+    `).bind(q, q, q, q).all<Post>();
+    posts = postResults.results || [];
+  }
+  
+  // Search products
+  if (type === 'all' || type === 'products') {
+    const productResults = await db.prepare(`
+      SELECT * FROM products WHERE is_active = 1 
+      AND (name_id LIKE ? OR name_en LIKE ? OR description_id LIKE ? OR description_en LIKE ?)
+      ORDER BY price DESC LIMIT 20
+    `).bind(q, q, q, q).all<Product>();
+    products = productResults.results || [];
+  }
+}
+
+const totalResults = posts.length + products.length;
+
+// Translations
+const trLocal = {
+  title: locale === 'en' ? 'Search' : 'Pencarian',
+  placeholder: locale === 'en' ? 'Search articles & products...' : 'Cari artikel & produk...',
+  results: locale === 'en' ? 'results found' : 'hasil ditemukan',
+  all: locale === 'en' ? 'All' : 'Semua',
+  blog: locale === 'en' ? 'Articles' : 'Artikel',
+  products: locale === 'en' ? 'Products' : 'Produk',
+  noResults: locale === 'en' ? 'No results found' : 'Tidak ada hasil',
+  tryDifferent: locale === 'en' ? 'Try different keywords' : 'Coba kata kunci lain',
+  buyNow: locale === 'en' ? 'Buy Now' : 'Beli',
+};
+
+function buildUrl(newType: string) {
+  const params = new URLSearchParams();
+  if (query) params.set('q', query);
+  if (newType !== 'all') params.set('type', newType);
+  return `/search?${params.toString()}`;
 }
 ---
 
-<BaseLayout title={`${t(tr.title, locale)}: ${query}`}>
+<BaseLayout title={`${trLocal.title}: ${query}`}>
   <div class="container mx-auto px-4 py-12">
-    <h1 class="text-4xl font-bold mb-8">{t(tr.title, locale)}</h1>
+    <h1 class="text-4xl font-bold mb-8">{trLocal.title}</h1>
     
-    <form action="/search" method="GET" class="mb-8">
-      <input type="search" name="q" value={query}
-             placeholder={t(tr.placeholder, locale)}
-             class="w-full md:w-96 px-4 py-3 bg-surface-50 border border-surface-100 
-                    rounded-lg focus:outline-none focus:border-accent" />
+    <!-- Search Form -->
+    <form action="/search" method="GET" class="mb-6">
+      <div class="flex flex-col md:flex-row gap-4">
+        <input type="search" name="q" value={query}
+               placeholder={trLocal.placeholder}
+               class="flex-1 px-4 py-3 bg-surface-50 border border-surface-100 
+                      rounded-lg focus:outline-none focus:border-accent" />
+        <input type="hidden" name="type" value={type} />
+        <button type="submit" class="btn-primary px-8">
+          {trLocal.title}
+        </button>
+      </div>
     </form>
     
-    {query && <p class="text-gray-500 mb-6">{results.length} {t(tr.results, locale)}</p>}
-    
-    <div class="grid md:grid-cols-3 gap-6">
-      {results.map(post => <ArticleCard post={post} locale={locale} />)}
+    <!-- Type Filter Tabs -->
+    <div class="flex gap-2 mb-8">
+      <a href={buildUrl('all')} 
+         class={`px-4 py-2 rounded-lg transition-colors ${type === 'all' ? 'bg-accent text-white' : 'bg-surface-50 hover:bg-surface-100'}`}>
+        {trLocal.all}
+      </a>
+      <a href={buildUrl('blog')} 
+         class={`px-4 py-2 rounded-lg transition-colors ${type === 'blog' ? 'bg-accent text-white' : 'bg-surface-50 hover:bg-surface-100'}`}>
+        {trLocal.blog} {type === 'all' && posts.length > 0 && `(${posts.length})`}
+      </a>
+      <a href={buildUrl('products')} 
+         class={`px-4 py-2 rounded-lg transition-colors ${type === 'products' ? 'bg-accent text-white' : 'bg-surface-50 hover:bg-surface-100'}`}>
+        {trLocal.products} {type === 'all' && products.length > 0 && `(${products.length})`}
+      </a>
     </div>
+    
+    {query && <p class="text-gray-500 mb-6">{totalResults} {trLocal.results}</p>}
+    
+    {totalResults === 0 && query && (
+      <div class="text-center py-12">
+        <span class="text-4xl mb-4 block">🔍</span>
+        <h2 class="text-xl font-bold mb-2">{trLocal.noResults}</h2>
+        <p class="text-gray-500">{trLocal.tryDifferent}</p>
+      </div>
+    )}
+    
+    <!-- Blog Results -->
+    {posts.length > 0 && (
+      <div class="mb-12">
+        {type === 'all' && <h2 class="text-2xl font-bold mb-6">{trLocal.blog}</h2>}
+        <div class="grid md:grid-cols-3 gap-6">
+          {posts.map(post => <ArticleCard post={post} locale={locale} />)}
+        </div>
+      </div>
+    )}
+    
+    <!-- Product Results -->
+    {products.length > 0 && (
+      <div>
+        {type === 'all' && <h2 class="text-2xl font-bold mb-6">{trLocal.products}</h2>}
+        <div class="grid md:grid-cols-3 gap-6">
+          {products.map(product => {
+            const name = locale === 'en' && product.name_en ? product.name_en : product.name_id;
+            const desc = locale === 'en' && product.description_en ? product.description_en : product.description_id;
+            return (
+              <a href={`/products/${product.slug}`} class="card group hover:border-accent transition-colors">
+                {product.image_url && (
+                  <img src={product.image_url} alt={name} 
+                       class="w-full h-48 object-cover rounded-lg mb-4" loading="lazy" />
+                )}
+                <h3 class="font-bold text-lg mb-2 group-hover:text-accent transition-colors">{name}</h3>
+                <p class="text-gray-500 text-sm mb-3 line-clamp-2">{desc}</p>
+                <div class="flex items-center justify-between">
+                  <span class="text-accent font-bold">Rp {product.price.toLocaleString('id-ID')}</span>
+                  <span class="text-sm text-gray-500">{trLocal.buyNow} →</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    )}
   </div>
 </BaseLayout>
