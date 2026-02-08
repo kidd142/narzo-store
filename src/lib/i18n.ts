@@ -64,22 +64,25 @@ export const translations = {
   },
   about: {
     title: { id: 'Tentang Kami', en: 'About Us' },
-    subtitle: { id: 'Narzo Store adalah marketplace digital universal terpercaya di Indonesia.', en: 'Narzo Store is a trusted universal digital marketplace in Indonesia.' },
+    subtitle: { 
+      id: 'Narzo Store adalah platform blog dan media digital dengan fokus konten teknologi, lifestyle, dan edukasi. Fitur marketplace menyediakan berbagai produk digital seperti e-book, template, kursus, software, lisensi, dan produk digital partner/affiliate.', 
+      en: 'Narzo Store is a blog and digital media platform focused on technology, lifestyle, and educational content. Our marketplace features various digital products including e-books, templates, courses, software, licenses, and partner/affiliate digital products.' 
+    },
     mission_title: { id: 'Misi Kami', en: 'Our Mission' },
-    mission_text: { id: 'Menyediakan layanan produk digital dengan harga terbaik, proses cepat, dan keamanan terjamin untuk semua.', en: 'Providing digital product services with the best prices, fast processing, and guaranteed security for everyone.' },
+    mission_text: { id: 'Menyediakan konten berkualitas dan produk digital terbaik dengan harga terjangkau, proses cepat, dan keamanan terjamin.', en: 'Providing quality content and the best digital products at affordable prices, with fast processing and guaranteed security.' },
     instant_title: { id: 'Proses Instan', en: 'Instant Processing' },
     instant_text: { id: 'Dengan sistem otomatis, pesanan Anda akan diproses dalam hitungan detik setelah pembayaran berhasil dikonfirmasi.', en: 'With our automated system, your order will be processed within seconds after payment is confirmed.' },
     secure_title: { id: 'Aman & Terpercaya', en: 'Safe & Trusted' },
     secure_text: { id: 'Semua transaksi dilindungi dengan enkripsi SSL dan kami bekerja sama dengan payment gateway terpercaya di Indonesia.', en: 'All transactions are protected with SSL encryption and we partner with trusted payment gateways in Indonesia.' },
     support_title: { id: 'Support 24/7', en: '24/7 Support' },
-    support_text: { id: 'Tim customer service kami siap membantu Anda kapan saja melalui WhatsApp, email, atau live chat.', en: 'Our customer service team is ready to help you anytime via WhatsApp, email, or live chat.' },
-    stats_title: { id: 'Dipercaya oleh Ribuan Gamers', en: 'Trusted by Thousands of Gamers' },
-    customers: { id: 'Pelanggan', en: 'Customers' },
+    support_text: { id: 'Tim kami siap membantu Anda kapan saja melalui email atau halaman kontak.', en: 'Our team is ready to help you anytime via email or contact page.' },
+    stats_title: { id: 'Dipercaya oleh Ribuan Pembaca', en: 'Trusted by Thousands of Readers' },
+    customers: { id: 'Pembaca', en: 'Readers' },
     transactions: { id: 'Transaksi', en: 'Transactions' },
-    products: { id: 'Produk', en: 'Products' },
+    products: { id: 'Produk Digital', en: 'Digital Products' },
     rating: { id: 'Rating', en: 'Rating' },
-    cta_title: { id: 'Siap untuk Top Up?', en: 'Ready to Top Up?' },
-    cta_text: { id: 'Mulai top up game favorit Anda sekarang!', en: 'Start topping up your favorite games now!' },
+    cta_title: { id: 'Siap Berbelanja?', en: 'Ready to Shop?' },
+    cta_text: { id: 'Jelajahi koleksi produk digital kami sekarang!', en: 'Explore our digital product collection now!' },
     view_products: { id: 'Lihat Produk', en: 'View Products' }
   },
   blog: {
