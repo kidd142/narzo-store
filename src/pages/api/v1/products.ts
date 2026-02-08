@@ -124,14 +124,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
         WHERE slug = ?
       `).bind(
         sanitizeText(name_id),
-        sanitizeText(name_en),
-        sanitizeText(description_id),
-        sanitizeText(description_en),
+        sanitizeText(name_en) || null,
+        sanitizeText(description_id) || null,
+        sanitizeText(description_en) || null,
         price,
-        image_url,
+        image_url || null,
         stock,
         is_digital ? 1 : 0,
-        download_url,
+        download_url || null,
         is_active ? 1 : 0,
         slug
       ).run();
@@ -155,14 +155,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
         id,
         slug,
         sanitizeText(name_id),
-        sanitizeText(name_en),
-        sanitizeText(description_id),
-        sanitizeText(description_en),
+        sanitizeText(name_en) || null,
+        sanitizeText(description_id) || null,
+        sanitizeText(description_en) || null,
         price,
-        image_url,
+        image_url || null,
         stock,
         is_digital ? 1 : 0,
-        download_url,
+        download_url || null,
         is_active ? 1 : 0
       ).run();
       
