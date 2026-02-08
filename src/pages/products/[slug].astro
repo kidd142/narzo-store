@@ -15,6 +15,24 @@ const tr = translations.products;
 const name = t({ id: product.name_id, en: product.name_en }, locale);
 const desc = t({ id: product.description_id, en: product.description_en }, locale);
 
+// Simple markdown to HTML converter
+function parseMarkdown(text: string): string {
+  if (!text) return '';
+  return text
+    // Bold **text**
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Bullet points
+    .replace(/^• /gm, '<li>')
+    .replace(/<li>(.+)$/gm, '<li>$1</li>')
+    // Checkmarks
+    .replace(/✅/g, '<span class="text-green-400">✅</span>')
+    // Line breaks
+    .replace(/\n\n/g, '</p><p class="mt-4">')
+    .replace(/\n/g, '<br>');
+}
+
+const descHtml = parseMarkdown(desc || '');
+
 // Check if payment is configured
 const paymentEnabled = !!Astro.locals?.runtime?.env?.TRIPAY_API_KEY;
 
@@ -46,7 +64,11 @@ const digitalNote = locale === 'en'
           Rp {product.price.toLocaleString()}
         </p>
         
-        {desc && <p class="text-gray-400 mb-8">{desc}</p>}
+        {descHtml && (
+          <div class="text-gray-400 mb-8 prose prose-invert prose-sm max-w-none">
+            <p set:html={descHtml}></p>
+          </div>
+        )}
         
         {paymentEnabled ? (
           <a href={`/checkout/${product.id}`} class="btn-primary inline-block">
