@@ -29,9 +29,9 @@ export default {
           light: '#171717' // Added for consistency
         },
         accent: {
-          DEFAULT: '#6366f1',
-          hover: '#818cf8',
-          muted: '#4f46e5'
+          DEFAULT: '#818cf8', // Brighter for better contrast (was #6366f1)
+          hover: '#a5b4fc',
+          muted: '#6366f1'
         }
       },
       

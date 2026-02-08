@@ -1,11 +1,7 @@
 name = "narzo-store"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-main = "dist/_worker.js"
-
-[assets]
-directory = "dist"
-binding = "ASSETS"
+pages_build_output_dir = "dist"
 
 [[d1_databases]]
 binding = "DB"
@@ -14,7 +10,7 @@ database_id = "93680d63-befd-4a65-adbb-0a8e08181639"
 
 [[kv_namespaces]]
 binding = "SESSIONS"
-id = "fda35e24a56542b7ba803fd66965a1d3"
+id = "551e108604db4f82b35728d82cb81f6d"
 
 [[r2_buckets]]
 binding = "MEDIA"
