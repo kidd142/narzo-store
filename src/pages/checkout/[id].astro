@@ -4,7 +4,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { t } from '../../lib/i18n';
 
 const { id } = Astro.params;
-const db = Astro.locals.runtime.env.DB;
+const env = Astro.locals.runtime.env;
+const db = env.DB;
+
 const product = await db.prepare(
   'SELECT * FROM products WHERE id = ? AND is_active = 1'
 ).bind(id).first();
@@ -12,11 +14,103 @@ const product = await db.prepare(
 if (!product) return Astro.redirect('/products');
 
 // Check payment config
-const paymentEnabled = !!Astro.locals.runtime.env.TRIPAY_API_KEY;
+const paymentEnabled = !!env.TRIPAY_API_KEY;
 if (!paymentEnabled) return Astro.redirect(`/products/${product.slug}`);
 
 const locale = (Astro.locals as any).locale || 'id';
 const name = t({ id: product.name_id, en: product.name_en }, locale);
+
+// Handle POST (form submission)
+let error = '';
+if (Astro.request.method === 'POST') {
+  try {
+    const formData = await Astro.request.formData();
+    const customerName = formData.get('name') as string;
+    const customerEmail = formData.get('email') as string;
+    const method = formData.get('method') as string;
+
+    if (!customerName || !customerEmail || !method) {
+      error = 'Please fill all fields';
+    } else {
+      // Generate merchant ref
+      const merchantRef = `NRZ-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      
+      // Create order
+      const orderId = crypto.randomUUID();
+      await db.prepare(`
+        INSERT INTO orders (id, merchant_ref, customer_name, customer_email, amount, payment_method, payment_status, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, 'UNPAID', datetime('now'))
+      `).bind(orderId, merchantRef, customerName, customerEmail, product.price, method).run();
+      
+      // Generate signature
+      const TRIPAY_MERCHANT_CODE = env.TRIPAY_MERCHANT_CODE;
+      const TRIPAY_PRIVATE_KEY = env.TRIPAY_PRIVATE_KEY;
+      const data = TRIPAY_MERCHANT_CODE + merchantRef + product.price;
+      const encoder = new TextEncoder();
+      const key = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(TRIPAY_PRIVATE_KEY),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+      const signatureBuffer = await crypto.subtle.sign('HMAC', key, encoder.encode(data));
+      const signature = Array.from(new Uint8Array(signatureBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+      
+      // Call Tripay API
+      const TRIPAY_API_KEY = env.TRIPAY_API_KEY;
+      const TRIPAY_MODE = env.TRIPAY_MODE || 'sandbox';
+      const baseUrl = TRIPAY_MODE === 'production' 
+        ? 'https://tripay.co.id/api' 
+        : 'https://tripay.co.id/api-sandbox';
+      
+      const payload = {
+        method: method,
+        merchant_ref: merchantRef,
+        amount: product.price,
+        customer_name: customerName,
+        customer_email: customerEmail,
+        order_items: [{
+          sku: product.id,
+          name: product.name_id || product.name_en,
+          price: product.price,
+          quantity: 1,
+        }],
+        callback_url: 'https://narzo.store/api/tripay/callback',
+        return_url: `https://narzo.store/payment/success?ref=${merchantRef}`,
+        expired_time: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
+        signature: signature,
+      };
+      
+      const response = await fetch(`${baseUrl}/transaction/create`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${TRIPAY_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update order with Tripay reference
+        await db.prepare(`
+          UPDATE orders SET tripay_reference = ?, checkout_url = ? WHERE id = ?
+        `).bind(result.data.reference, result.data.checkout_url, orderId).run();
+        
+        // Redirect to Tripay
+        return Astro.redirect(result.data.checkout_url);
+      } else {
+        error = result.message || 'Payment error';
+      }
+    }
+  } catch (e: any) {
+    error = e.message || 'Checkout error';
+  }
+}
 
 // Translations
 const tr = {
@@ -33,6 +127,12 @@ const tr = {
   <div class="container mx-auto px-4 py-12 max-w-lg">
     <h1 class="text-3xl font-bold mb-8">{tr.checkout}</h1>
     
+    {error && (
+      <div class="bg-red-500/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6">
+        {error}
+      </div>
+    )}
+    
     <!-- Order Summary -->
     <div class="card mb-6">
       <h2 class="font-semibold mb-4">{tr.orderSummary}</h2>
@@ -43,9 +143,7 @@ const tr = {
     </div>
     
     <!-- Checkout Form -->
-    <form method="POST" action="/api/checkout" class="card space-y-4">
-      <input type="hidden" name="product_id" value={id} />
-      
+    <form method="POST" class="card space-y-4">
       <div>
         <label class="block text-sm text-gray-400 mb-1">{tr.name}</label>
         <input type="text" name="name" required
