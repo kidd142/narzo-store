@@ -97,6 +97,7 @@ CREATE TABLE IF NOT EXISTS orders (
   payment_method TEXT,
   payment_status TEXT DEFAULT 'UNPAID',
   tripay_reference TEXT,
+  checkout_url TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   paid_at DATETIME,
   order_items TEXT
