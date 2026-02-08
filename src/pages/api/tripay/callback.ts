@@ -65,15 +65,73 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const payload: CallbackPayload = JSON.parse(rawBody);
     const { merchant_ref, status, paid_at, reference } = payload;
 
-    // Update order status in database
     if (DB) {
+      // 1. Fetch existing order to check status & get items
+      const order = await DB.prepare('SELECT * FROM orders WHERE merchant_ref = ?').bind(merchant_ref).first();
+      
+      if (!order) {
+        return new Response(JSON.stringify({ success: false, message: "Order not found" }), { 
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // If already PAID, ignore to prevent duplicates
+      if (order.payment_status === 'PAID' && status === 'PAID') {
+         return new Response(JSON.stringify({ success: true }), {
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+
+      // 2. If status is PAID, generate digital delivery tokens
       if (status === 'PAID') {
+        const orderItems = JSON.parse(order.order_items as string || '[]');
+        
+        for (const item of orderItems) {
+          // Generate tokens
+          const libraryToken = crypto.randomUUID();
+          const downloadToken = crypto.randomUUID();
+          const transactionId = crypto.randomUUID();
+          
+          // Insert into transactions (Digital Entitlement)
+          await DB.prepare(`
+            INSERT INTO transactions (
+              id, product_id, product_name, merchant_ref, amount, status, 
+              payment_method, reference, customer_name, customer_email,
+              library_token, download_token, download_expires, max_downloads,
+              paid_at
+            ) VALUES (
+              ?, ?, ?, ?, ?, 'paid',
+              ?, ?, ?, ?,
+              ?, ?, datetime('now', '+7 days'), ?,
+              datetime(?, 'unixepoch')
+            )
+          `).bind(
+            transactionId,
+            item.sku || item.id || 'unknown', // Fallback
+            item.name,
+            merchant_ref,
+            item.price,
+            order.payment_method,
+            reference,
+            order.customer_name,
+            order.customer_email,
+            libraryToken,
+            downloadToken,
+            5, // Max downloads default
+            paid_at
+          ).run();
+        }
+
+        // Update Order Status
         await DB.prepare(`
           UPDATE orders 
           SET payment_status = ?, tripay_reference = ?, paid_at = datetime(?, 'unixepoch')
           WHERE merchant_ref = ?
         `).bind(status, reference, paid_at, merchant_ref).run();
+
       } else {
+        // Just update status (PENDING/FAILED/EXPIRED)
         await DB.prepare(`
           UPDATE orders 
           SET payment_status = ?

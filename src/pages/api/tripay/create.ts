@@ -1,9 +1,11 @@
 import type { APIRoute } from 'astro';
 
 interface OrderItem {
+  id: string; // Product ID
   name: string;
   price: number;
   quantity: number;
+  sku?: string;
 }
 
 interface CreateTransactionRequest {
@@ -77,12 +79,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       customer_email,
       customer_phone: customer_phone || '',
       order_items: order_items.map(item => ({
+        sku: item.id || item.sku,
         name: item.name,
         price: item.price,
         quantity: item.quantity
       })),
       callback_url: 'https://narzo.store/api/tripay/callback',
-      return_url: 'https://narzo.store/payment/success',
+      return_url: `https://narzo.store/payment/success?ref=${merchantRef}`,
       expired_time: Math.floor(Date.now() / 1000) + (24 * 60 * 60),
       signature
     };
