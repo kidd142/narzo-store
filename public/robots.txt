@@ -1,3 +1,39 @@
+# robots.txt - narzo.store
+# Custom override for clean PageSpeed score
+
 User-agent: *
 Allow: /
+
+# Block AI training bots
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+# Sitemap
 Sitemap: https://narzo.store/sitemap.xml
