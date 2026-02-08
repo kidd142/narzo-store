@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const { token } = Astro.params;
 const env = Astro.locals.runtime.env;
 const DB = env.DB;
+const locale = Astro.currentLocale || 'id';
 
 if (!token) {
   return Astro.redirect('/');
@@ -55,9 +56,30 @@ if (!transaction) {
 
 const remainingDownloads = transaction.max_downloads - transaction.downloads_used;
 const isLimitReached = remainingDownloads <= 0;
+
+// Translations
+const t = {
+  purchasedOn: locale === 'en' ? 'Purchased on' : 'Dibeli pada',
+  status: locale === 'en' ? 'Status' : 'Status',
+  active: locale === 'en' ? 'Active' : 'Aktif',
+  downloadsUsed: locale === 'en' ? 'Downloads Used' : 'Download Terpakai',
+  expiresIn: locale === 'en' ? 'Expires In' : 'Berakhir Dalam',
+  hours: locale === 'en' ? 'Hours' : 'Jam',
+  download: locale === 'en' ? 'Download File' : 'Download File',
+  limitReached: locale === 'en' ? 'Download Limit Reached' : 'Batas Download Tercapai',
+  warning: locale === 'en' ? 'Please download and save the file immediately. Link expires for security.' : 'Harap segera download dan simpan file. Link akan kadaluarsa demi keamanan.',
+  description: locale === 'en' ? 'Description' : 'Deskripsi',
+  noDescription: locale === 'en' ? 'No description available.' : 'Tidak ada deskripsi.',
+  txRef: locale === 'en' ? 'Transaction Ref:' : 'Ref Transaksi:',
+  library: 'Library'
+};
+
+const productName = product?.name_id || transaction.product_name;
+const description = locale === 'en' && product?.description_en ? product.description_en : (product?.description_id || t.noDescription);
+const pageTitle = `${t.library} - ${productName}`;
 ---
 
-<BaseLayout title={`Library - ${product?.name_id || 'Digital Item'}`}>
+<BaseLayout title={pageTitle}>
   <div class="min-h-screen bg-slate-900 flex flex-col items-center py-12 px-4">
     
     <div class="max-w-2xl w-full bg-slate-800 rounded-2xl shadow-2xl overflow-hidden border border-slate-700">
@@ -67,7 +89,7 @@ const isLimitReached = remainingDownloads <= 0;
         {product?.image_url ? (
           <img 
             src={product.image_url} 
-            alt={product.name_id} 
+            alt={productName} 
             class="w-full h-full object-cover opacity-80"
           />
         ) : (
@@ -78,10 +100,10 @@ const isLimitReached = remainingDownloads <= 0;
         <div class="absolute inset-0 bg-gradient-to-t from-slate-800 to-transparent"></div>
         <div class="absolute bottom-4 left-6">
           <h1 class="text-3xl font-bold text-white shadow-black drop-shadow-lg">
-            {product?.name_id || transaction.product_name}
+            {productName}
           </h1>
           <p class="text-slate-300 text-sm mt-1">
-            Purchased on {new Date(transaction.paid_at * 1000).toLocaleDateString()}
+            {t.purchasedOn} {new Date(transaction.paid_at * 1000).toLocaleDateString()}
           </p>
         </div>
       </div>
@@ -91,16 +113,16 @@ const isLimitReached = remainingDownloads <= 0;
         {/* Status Section */}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="bg-slate-700/50 p-4 rounded-xl text-center border border-slate-600">
-            <span class="block text-slate-400 text-xs uppercase tracking-wider mb-1">Status</span>
-            <span class="text-green-400 font-bold">Active</span>
+            <span class="block text-slate-400 text-xs uppercase tracking-wider mb-1">{t.status}</span>
+            <span class="text-green-400 font-bold">{t.active}</span>
           </div>
           <div class="bg-slate-700/50 p-4 rounded-xl text-center border border-slate-600">
-            <span class="block text-slate-400 text-xs uppercase tracking-wider mb-1">Downloads Used</span>
+            <span class="block text-slate-400 text-xs uppercase tracking-wider mb-1">{t.downloadsUsed}</span>
             <span class="text-white font-bold">{transaction.downloads_used} / {transaction.max_downloads}</span>
           </div>
           <div class="bg-slate-700/50 p-4 rounded-xl text-center border border-slate-600">
-            <span class="block text-slate-400 text-xs uppercase tracking-wider mb-1">Expires In</span>
-            <span class="text-blue-400 font-bold">24 Hours</span>
+            <span class="block text-slate-400 text-xs uppercase tracking-wider mb-1">{t.expiresIn}</span>
+            <span class="text-blue-400 font-bold">24 {t.hours}</span>
           </div>
         </div>
 
@@ -111,24 +133,24 @@ const isLimitReached = remainingDownloads <= 0;
               href={`/api/download/${transaction.download_token}`}
               class="block w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-xl rounded-xl shadow-lg shadow-blue-600/20 transform transition hover:-translate-y-1"
             >
-              Download File
+              {t.download}
             </a>
           ) : (
             <button disabled class="block w-full py-4 bg-slate-600 text-slate-400 font-bold text-xl rounded-xl cursor-not-allowed">
-              Download Limit Reached
+              {t.limitReached}
             </button>
           )}
           
           <p class="text-slate-500 text-sm">
-            Please download and save the file immediately. Link expires for security.
+            {t.warning}
           </p>
         </div>
 
         {/* Product Details */}
         <div class="prose prose-invert max-w-none">
-          <h3 class="text-white border-b border-slate-700 pb-2">Description</h3>
+          <h3 class="text-white border-b border-slate-700 pb-2">{t.description}</h3>
           <p class="text-slate-300 mt-4">
-            {product?.description_id || "No description available."}
+            {description}
           </p>
         </div>
 
@@ -136,7 +158,7 @@ const isLimitReached = remainingDownloads <= 0;
       
       {/* Footer */}
       <div class="bg-slate-900/50 p-4 text-center border-t border-slate-700">
-        <p class="text-xs text-slate-500">Transaction Ref: {transaction.reference || transaction.merchant_ref}</p>
+        <p class="text-xs text-slate-500">{t.txRef} {transaction.reference || transaction.merchant_ref}</p>
       </div>
 
     </div>

@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS products (
   description_en TEXT,
   price INTEGER NOT NULL,
   image_url TEXT,
+  category TEXT,
   stock INTEGER DEFAULT -1,
   sold INTEGER DEFAULT 0,
   is_digital INTEGER DEFAULT 0,
