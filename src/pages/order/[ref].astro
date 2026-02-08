@@ -1,10 +1,11 @@
-
 ---
 // src/pages/order/[ref].astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { t } from '../../lib/i18n';
 
 const { ref } = Astro.params;
 const db = Astro.locals.runtime.env.DB;
+const locale = (Astro.locals as any).locale || 'id';
 
 const tx = await db.prepare(`
   SELECT t.*, p.name_id, p.name_en, p.is_digital, t.download_token, t.downloads_used, t.max_downloads
@@ -12,9 +13,31 @@ const tx = await db.prepare(`
   LEFT JOIN products p ON t.product_id = p.id
   WHERE t.reference = ?
 `).bind(ref).first();
+
+const productName = tx ? t({ id: tx.name_id, en: tx.name_en }, locale) : '';
+
+// Translations
+const tr = {
+  orderStatus: locale === 'en' ? 'Order Status' : 'Status Pesanan',
+  product: locale === 'en' ? 'Product' : 'Produk',
+  amount: locale === 'en' ? 'Amount' : 'Jumlah',
+  email: locale === 'en' ? 'Email' : 'Email',
+  date: locale === 'en' ? 'Date' : 'Tanggal',
+  downloadProduct: locale === 'en' ? 'Download Product' : 'Unduh Produk',
+  downloadsUsed: locale === 'en' ? 'downloads used' : 'unduhan digunakan',
+  waitingPayment: locale === 'en' ? 'Waiting for payment...' : 'Menunggu pembayaran...',
+  completePayment: locale === 'en' 
+    ? 'Please complete your payment via the link provided during checkout.' 
+    : 'Silakan selesaikan pembayaran melalui link yang diberikan saat checkout.',
+  orderNotFound: locale === 'en' ? 'Order not found' : 'Pesanan tidak ditemukan',
+  checkReference: locale === 'en' ? 'Please check your reference number' : 'Silakan periksa nomor referensi Anda',
+  checkAnother: locale === 'en' ? 'Check Another Order' : 'Cek Pesanan Lain',
+  orderRef: locale === 'en' ? 'Order reference' : 'Referensi pesanan',
+  check: locale === 'en' ? 'Check' : 'Cek',
+};
 ---
 
-<BaseLayout title="Order Status">
+<BaseLayout title={tr.orderStatus}>
   <div class="container mx-auto px-4 py-12 max-w-lg">
     {tx ? (
       <div class="card">
@@ -31,19 +54,19 @@ const tx = await db.prepare(`
         
         <dl class="space-y-4">
           <div>
-            <dt class="text-sm text-gray-500">Product</dt>
-            <dd class="font-medium">{tx.name_id}</dd>
+            <dt class="text-sm text-gray-500">{tr.product}</dt>
+            <dd class="font-medium">{productName}</dd>
           </div>
           <div>
-            <dt class="text-sm text-gray-500">Amount</dt>
-            <dd class="font-medium text-accent">Rp {tx.amount.toLocaleString()}</dd>
+            <dt class="text-sm text-gray-500">{tr.amount}</dt>
+            <dd class="font-medium text-accent">Rp {tx.amount.toLocaleString('id-ID')}</dd>
           </div>
           <div>
-            <dt class="text-sm text-gray-500">Email</dt>
+            <dt class="text-sm text-gray-500">{tr.email}</dt>
             <dd class="font-medium">{tx.customer_email}</dd>
           </div>
           <div>
-            <dt class="text-sm text-gray-500">Date</dt>
+            <dt class="text-sm text-gray-500">{tr.date}</dt>
             <dd class="font-medium">{tx.created_at}</dd>
           </div>
         </dl>
@@ -51,10 +74,10 @@ const tx = await db.prepare(`
         {tx.status === 'paid' && tx.is_digital && tx.download_token && (
           <div class="mt-6 pt-6 border-t border-surface-100">
             <a href={`/api/download/${tx.download_token}`} class="btn-primary w-full text-center">
-              Download Product
+              {tr.downloadProduct}
             </a>
             <p class="text-sm text-gray-500 mt-2">
-              {tx.downloads_used}/{tx.max_downloads} downloads used
+              {tx.downloads_used}/{tx.max_downloads} {tr.downloadsUsed}
             </p>
           </div>
         )}
@@ -62,10 +85,8 @@ const tx = await db.prepare(`
         {tx.status === 'pending' && (
           <div class="mt-6">
             <div class="alert-warning">
-              <p>Waiting for payment...</p>
-              <!-- Assuming we have a payment_url stored or reconstruct it -->
-              {/* For Tripay, we usually get a checkout_url. If we didn't store it, we might need to regenerate or just show "Check your email/history" */}
-              <p class="text-sm mt-2">Please complete your payment via the link provided during checkout.</p>
+              <p>{tr.waitingPayment}</p>
+              <p class="text-sm mt-2">{tr.completePayment}</p>
             </div>
           </div>
         )}
@@ -73,17 +94,17 @@ const tx = await db.prepare(`
     ) : (
       <div class="empty-state">
         <span class="text-4xl mb-4">🔍</span>
-        <h2 class="text-xl font-bold mb-2">Order not found</h2>
-        <p class="text-gray-500">Please check your reference number</p>
+        <h2 class="text-xl font-bold mb-2">{tr.orderNotFound}</h2>
+        <p class="text-gray-500">{tr.checkReference}</p>
       </div>
     )}
     
     <!-- Order lookup form -->
     <div class="card mt-8">
-      <h3 class="font-bold mb-4">Check Another Order</h3>
+      <h3 class="font-bold mb-4">{tr.checkAnother}</h3>
       <form action="/order" method="get" class="flex gap-2">
-        <input type="text" name="ref" placeholder="Order reference" class="input flex-1" required />
-        <button type="submit" class="btn-primary">Check</button>
+        <input type="text" name="ref" placeholder={tr.orderRef} class="input flex-1" required />
+        <button type="submit" class="btn-primary">{tr.check}</button>
       </form>
     </div>
   </div>

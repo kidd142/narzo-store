@@ -1,10 +1,10 @@
-
 ---
 // src/pages/checkout/success.astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 const txId = Astro.url.searchParams.get('id');
 const db = Astro.locals.runtime.env.DB;
+const locale = (Astro.locals as any).locale || 'id';
 
 let tx = null;
 if (txId) {
@@ -12,31 +12,40 @@ if (txId) {
     'SELECT * FROM transactions WHERE id = ?'
   ).bind(txId).first();
 }
+
+// Translations
+const tr = {
+  paymentSuccess: locale === 'en' ? 'Payment Successful!' : 'Pembayaran Berhasil!',
+  thankYou: locale === 'en' 
+    ? 'Thank you for your purchase. Check your email for details.' 
+    : 'Terima kasih atas pembelian Anda. Cek email untuk detail.',
+  processing: locale === 'en' ? 'Processing...' : 'Memproses...',
+  processingDesc: locale === 'en' 
+    ? 'Your payment is being processed. This page will update automatically.' 
+    : 'Pembayaran Anda sedang diproses. Halaman ini akan diperbarui otomatis.',
+  backHome: locale === 'en' ? 'Back to Home' : 'Kembali ke Beranda',
+};
 ---
 
-<BaseLayout title="Payment" showHeaderAd={false} showFooterAd={false}>
+<BaseLayout title={locale === 'en' ? 'Payment' : 'Pembayaran'} showHeaderAd={false} showFooterAd={false}>
   <div class="container mx-auto px-4 py-24 text-center">
     {tx?.status === 'paid' ? (
       <>
         <div class="text-6xl mb-6">✅</div>
-        <h1 class="text-3xl font-bold mb-4">Payment Successful!</h1>
-        <p class="text-gray-400 mb-8">
-          Thank you for your purchase. Check your email for details.
-        </p>
+        <h1 class="text-3xl font-bold mb-4">{tr.paymentSuccess}</h1>
+        <p class="text-gray-400 mb-8">{tr.thankYou}</p>
       </>
     ) : (
       <>
         <div class="text-6xl mb-6">⏳</div>
-        <h1 class="text-3xl font-bold mb-4">Processing...</h1>
-        <p class="text-gray-400 mb-8">
-          Your payment is being processed. This page will update automatically.
-        </p>
+        <h1 class="text-3xl font-bold mb-4">{tr.processing}</h1>
+        <p class="text-gray-400 mb-8">{tr.processingDesc}</p>
         <script is:inline>
           setTimeout(() => location.reload(), 5000);
         </script>
       </>
     )}
     
-    <a href="/" class="btn-primary inline-block">Back to Home</a>
+    <a href="/" class="btn-primary inline-block">{tr.backHome}</a>
   </div>
 </BaseLayout>

@@ -1,4 +1,3 @@
-
 ---
 // src/pages/checkout/[id].astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
@@ -16,20 +15,30 @@ if (!product) return Astro.redirect('/products');
 const paymentEnabled = !!Astro.locals.runtime.env.TRIPAY_API_KEY;
 if (!paymentEnabled) return Astro.redirect(`/products/${product.slug}`);
 
-const locale = Astro.currentLocale || 'id';
+const locale = (Astro.locals as any).locale || 'id';
 const name = t({ id: product.name_id, en: product.name_en }, locale);
+
+// Translations
+const tr = {
+  checkout: locale === 'en' ? 'Checkout' : 'Checkout',
+  orderSummary: locale === 'en' ? 'Order Summary' : 'Ringkasan Pesanan',
+  name: locale === 'en' ? 'Name' : 'Nama',
+  email: locale === 'en' ? 'Email' : 'Email',
+  paymentMethod: locale === 'en' ? 'Payment Method' : 'Metode Pembayaran',
+  payNow: locale === 'en' ? 'Pay' : 'Bayar',
+};
 ---
 
-<BaseLayout title={`Checkout: ${name}`} showHeaderAd={false} showFooterAd={false}>
+<BaseLayout title={`${tr.checkout}: ${name}`} showHeaderAd={false} showFooterAd={false}>
   <div class="container mx-auto px-4 py-12 max-w-lg">
-    <h1 class="text-3xl font-bold mb-8">Checkout</h1>
+    <h1 class="text-3xl font-bold mb-8">{tr.checkout}</h1>
     
     <!-- Order Summary -->
     <div class="card mb-6">
-      <h2 class="font-semibold mb-4">Order Summary</h2>
+      <h2 class="font-semibold mb-4">{tr.orderSummary}</h2>
       <div class="flex justify-between items-center">
         <span>{name}</span>
-        <span class="font-bold">Rp {product.price.toLocaleString()}</span>
+        <span class="font-bold">Rp {product.price.toLocaleString('id-ID')}</span>
       </div>
     </div>
     
@@ -38,19 +47,19 @@ const name = t({ id: product.name_id, en: product.name_en }, locale);
       <input type="hidden" name="product_id" value={id} />
       
       <div>
-        <label class="block text-sm text-gray-400 mb-1">Nama</label>
+        <label class="block text-sm text-gray-400 mb-1">{tr.name}</label>
         <input type="text" name="name" required
                class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg" />
       </div>
       
       <div>
-        <label class="block text-sm text-gray-400 mb-1">Email</label>
+        <label class="block text-sm text-gray-400 mb-1">{tr.email}</label>
         <input type="email" name="email" required
                class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg" />
       </div>
       
       <div>
-        <label class="block text-sm text-gray-400 mb-1">Metode Pembayaran</label>
+        <label class="block text-sm text-gray-400 mb-1">{tr.paymentMethod}</label>
         <select name="method" required
                 class="w-full px-4 py-2 bg-surface border border-surface-100 rounded-lg">
           <option value="QRIS">QRIS (All E-Wallet)</option>
@@ -64,7 +73,7 @@ const name = t({ id: product.name_id, en: product.name_en }, locale);
       </div>
       
       <button type="submit" class="btn-primary w-full">
-        Bayar Rp {product.price.toLocaleString()}
+        {tr.payNow} Rp {product.price.toLocaleString('id-ID')}
       </button>
     </form>
   </div>
