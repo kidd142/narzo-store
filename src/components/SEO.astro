@@ -61,6 +61,11 @@ const organizationSchema = {
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
+<!-- Hreflang for bilingual SEO -->
+<link rel="alternate" hreflang="id" href={canonicalURL} />
+<link rel="alternate" hreflang="en" href={canonicalURL} />
+<link rel="alternate" hreflang="x-default" href={canonicalURL} />
+
 <!-- Primary Meta Tags -->
 <title>{fullTitle}</title>
 <meta name="title" content={fullTitle} />
