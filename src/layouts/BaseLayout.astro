@@ -37,9 +37,6 @@ const adsEnabled = import.meta.env.ADSENSE_ENABLED === 'true';
 <head>
   <SEO title={title} description={description} image={finalOgImage} ignoreSiteName={ignoreSiteName} />
   
-  <!-- Monetag Verification -->
-  <meta name="monetag" content="f98d45595a73c0ed724250949048443b">
-  
   <!-- Extra head content (for schema etc) -->
   <slot name="head" />
   
@@ -86,11 +83,5 @@ const adsEnabled = import.meta.env.ADSENSE_ENABLED === 'true';
   )}
   
   <Footer />
-  
-  <!-- Monetag Ads (Vignette only - In-Page Push removed for cleaner UX) -->
-  <script is:inline>
-    // Vignette Banner
-    (function(s){s.dataset.zone='10588462',s.src='https://gizokraijaw.net/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))
-  </script>
 </body>
 </html>
