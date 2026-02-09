@@ -1,7 +1,7 @@
 // src/middleware.ts
 import { defineMiddleware } from 'astro:middleware';
 
-// Security headers
+// Security headers (CSP removed to allow third-party ad scripts like Monetag)
 const securityHeaders = {
   'X-Frame-Options': 'DENY',
   'X-Content-Type-Options': 'nosniff',
@@ -9,15 +9,6 @@ const securityHeaders = {
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-  'Content-Security-Policy': [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://cdn.quilljs.com",
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.quilljs.com",
-    "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://pagead2.googlesyndication.com",
-    "frame-ancestors 'none'"
-  ].join('; ')
 };
 
 // Get locale from cookie
