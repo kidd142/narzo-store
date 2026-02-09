@@ -37,6 +37,9 @@ const adsEnabled = import.meta.env.ADSENSE_ENABLED === 'true';
 <head>
   <SEO title={title} description={description} image={finalOgImage} ignoreSiteName={ignoreSiteName} />
   
+  <!-- Monetag Verification -->
+  <meta name="monetag" content="f98d45595a73c0ed724250949048443b">
+  
   <!-- Extra head content (for schema etc) -->
   <slot name="head" />
   
