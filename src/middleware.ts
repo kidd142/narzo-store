@@ -1,7 +1,7 @@
 // src/middleware.ts
 import { defineMiddleware } from 'astro:middleware';
 
-// Security headers (CSP removed to allow third-party ad scripts like Monetag)
+// Security headers (CSP removed to allow third-party ad scripts)
 const securityHeaders = {
   'X-Frame-Options': 'DENY',
   'X-Content-Type-Options': 'nosniff',
