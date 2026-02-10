@@ -51,6 +51,24 @@ export async function GET(context: APIContext) {
     }
   }
 
+  // Format datetime to ISO 8601 (W3C format for sitemaps)
+  const formatDate = (dateStr: string): string => {
+    if (!dateStr) return new Date().toISOString();
+    
+    // If already ISO format, return as is
+    if (dateStr.includes('T') && dateStr.includes('Z')) return dateStr;
+    
+    // Convert "YYYY-MM-DD HH:MM:SS" to ISO 8601 with timezone
+    // Replace space with T, add timezone (+07:00 for Jakarta)
+    const isoString = dateStr.replace(' ', 'T');
+    
+    // If timezone already present, return
+    if (isoString.includes('+') || isoString.endsWith('Z')) return isoString;
+    
+    // Add Jakarta timezone
+    return isoString + '+07:00';
+  };
+
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${staticPages.map(page => `  <url>
@@ -65,7 +83,7 @@ ${categories.map(cat => `  <url>
   </url>`).join('\n')}
 ${posts.map(post => `  <url>
     <loc>${baseUrl}/blog/${post.slug}</loc>
-    <lastmod>${post.updated_at || post.created_at}</lastmod>
+    <lastmod>${formatDate(post.updated_at || post.created_at)}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>`).join('\n')}
